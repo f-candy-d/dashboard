@@ -127,7 +127,14 @@ final public class SqlEntity {
     }
 
     public boolean getBoolean(@NonNull String column) {
-        return mValueMap.getAsBoolean(column);
+        int intValue = mValueMap.getAsInteger(column);
+        if (intValue == Repository.SQLITE_BOOL_TRUE) {
+            return true;
+        } else if (intValue == Repository.SQLITE_BOOL_FALSE) {
+            return false;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     public String getString(@NonNull String column) {

@@ -45,13 +45,18 @@ public class Dashboard extends SqliteStreamEntity {
     @Override
     protected void constructFromSqlEntity(@NonNull SqlEntity entity) {
         mTitle = entity.getStringOrDefault(DashboardTable._TITLE, mTitle);
-        mIsArchived = entity.getBooleanOrDefault(DashboardTable._TITLE, mIsArchived);
+        mIsArchived = entity.getBooleanOrDefault(DashboardTable._IS_ARCHIVED, mIsArchived);
     }
 
     @Override
     public void initializeWithDefaultColumnValues() {
         mTitle = DashboardTable.defaultTitle();
         mIsArchived = DashboardTable.defaultIsArchived();
+    }
+
+    @Override
+    public boolean isDefaultState() {
+        return equals(new Dashboard());
     }
 
     @Override

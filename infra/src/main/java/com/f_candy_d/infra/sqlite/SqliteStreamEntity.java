@@ -79,17 +79,14 @@ abstract public class SqliteStreamEntity {
      * Save data to the database
      */
     public final boolean commit() {
-        if (mId == INVALID_ID) {
-            return false;
-        }
-
         SqlEntity sqlEntity = toSqlEntity();
         if (sqlEntity == null) {
             return false;
         }
         sqlEntity.put(ID_COLUMN_NAME, mId);
 
-        if (Repository.getSqlite().selectRowById(mTableName, mId) == null) {
+        if (mId == INVALID_ID ||
+                Repository.getSqlite().selectRowById(mTableName, mId) == null) {
             // Insert
             sqlEntity.remove(ID_COLUMN_NAME);
             mId = Repository.getSqlite().insert(sqlEntity);
@@ -121,6 +118,7 @@ abstract public class SqliteStreamEntity {
     abstract protected SqlEntity toSqlEntity();
     abstract protected void constructFromSqlEntity(@NonNull SqlEntity entity);
     abstract public void initializeWithDefaultColumnValues();
+    abstract public boolean isDefaultState();
     abstract @Override public boolean equals(Object obj);
     abstract @Override public int hashCode();
 }

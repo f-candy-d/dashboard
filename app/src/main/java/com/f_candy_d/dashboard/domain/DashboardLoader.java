@@ -34,6 +34,7 @@ public class DashboardLoader extends SqliteEntityLoader<Dashboard> {
 
         Dashboard[] dashboards = new Dashboard[results.length];
         for (int i = 0; i < results.length; ++i) {
+            results[i].setTableName(DashboardTable.TABLE_NAME);
             dashboards[i] = new Dashboard(results[i]);
         }
 
