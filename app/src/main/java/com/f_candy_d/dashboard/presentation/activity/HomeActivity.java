@@ -1,5 +1,6 @@
-package com.f_candy_d.dashboard.presentation;
+package com.f_candy_d.dashboard.presentation.activity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -57,5 +59,19 @@ public class HomeActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(SINGLE_SPAN_COUNT, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(mDashboardAdapter);
+
+        // # Bottom Tools
+
+        findViewById(R.id.add_new_board_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchDashboardEditor();
+            }
+        });
+    }
+
+    private void launchDashboardEditor() {
+        Intent intent = new Intent(this, DashboardEditorActivity.class);
+        startActivity(intent);
     }
 }
