@@ -1,0 +1,45 @@
+package com.f_candy_d.dashboard.data_store;
+
+import com.f_candy_d.infra.sqlite.SqliteBaseTable;
+import com.f_candy_d.infra.sqlite.SqliteColumnDataType;
+import com.f_candy_d.infra.sqlite.SqliteTableUtils;
+
+/**
+ * Created by daichi on 9/30/17.
+ */
+
+public class DashboardTable extends SqliteBaseTable {
+
+    private DashboardTable() {}
+
+    public static final String TABLE_NAME = "dashboard";
+
+    /**
+     * COLUMNS
+     * ----------------------------------------------------------------------------- */
+
+    public static final String _TITLE = "title";
+    public static final String _IS_ARCHIVED = "is_archived";
+
+    /**
+     * TABLE DEFINITION
+     * ----------------------------------------------------------------------------- */
+
+    static SqliteTableUtils.TableSource getTableSource() {
+        return getBaseTableSource(TABLE_NAME)
+                .put(_TITLE, SqliteColumnDataType.TEXT)
+                .put(_IS_ARCHIVED, SqliteColumnDataType.INTEGER);
+    }
+
+    /**
+     * DEFAULT COLUMN VALUES
+     * ----------------------------------------------------------------------------- */
+
+    public static String defaultTitle() {
+        return null;
+    }
+
+    public static boolean defaultIsArchived() {
+        return false;
+    }
+}

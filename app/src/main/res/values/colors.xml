@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/google_settings_app_color_primary</color>
+    <color name="colorPrimaryDark">@color/google_settings_app_color_primary_dark</color>
+    <color name="colorAccent">@color/google_settings_app_color_primary</color>
+
+    <color name="home_toolbar_background">@color/system_light_bg</color>
+    <color name="home_toolbar_title">@color/primary_text_light</color>
+    <color name="home_status_bar">@color/status_bar_transparent_dark</color>
+
+    <color name="google_material_icon_gray">#707070</color>
+    <color name="system_light_bg">#fffafafa</color>
+    <color name="status_bar_transparent_dark">#4c000000</color>
+    <color name="event_theme_color">#388E3C</color>
+
+    <color name="google_settings_app_color_primary">#293238</color>
+    <color name="google_settings_app_color_primary_dark">#23272b</color>
+
+    <!--<color name="color_set_1_primary">#8acfa3</color>-->
+    <!--<color name="color_set_1_dark">#66c196</color>-->
+    <!--<color name="color_set_1_accent">#8593d0</color>-->
+    <color name="color_set_1_primary">#008979</color>
+    <color name="color_set_1_dark">#008474</color>
+    <color name="color_set_1_accent">#f4b214</color>
+
+    <color name="color_cream_green_light">#7dc796</color>
+    <color name="color_cream_green">#5abb88</color>
+    <color name="color_cream_blue">#7484bf</color>
+    <color name="color_cream_blue_light">#7989c7</color>
+    <color name="color_orange_dark">#bf360c</color>
+    <color name="color_cream_orange">#f56d40</color>
+    <color name="color_cream_orange_light">#ff7143</color>
+    <color name="color_teal_dark">#008474</color>
+    <color name="color_teal">#008979</color>
+    <color name="color_yellow">#f4b214</color>
+    <color name="color_blue_dark">#2952aa</color>
+    <color name="color_blue">#3367d5</color>
+    <color name="color_gray_dark">#889fa4</color>
+    <color name="color_gray">#8ea5ab</color>
+    <color name="color_blue_gray">#607c88</color>
+    <color name="color_cream_orange_2">#fd6f49</color>
+    <color name="color_white_orange_dark">#f5d5ae</color>
+    <color name="color_white_orange">#ffdeb5</color>
+    <color name="color_teal_2">#329f9c</color>
+    <color name="color_green_yellow">#becc31</color>
+    <color name="color_teal_more_dark">#004e50</color>
+    <color name="color_teal_light">#26a699</color>
+    <color name="color_teal_little_dark">#006164</color>
+    <color name="color_cream_teal">#7dcecf</color>
+    <color name="color_purple_dark">#4e0570</color>
+    <color name="color_cream_red">#ec5453</color>
+    <color name="color_cream_red_light">#fc714a</color>
+    <color name="color_cream_yellow_dark">#f5d481</color>
+    <color name="color_cream_yellow">#ffdd86</color>
+    <color name="color_green_dark">#0d9855</color>
+    <color name="color_green">#0e9e58</color>
+    <color name="color_yellow_light">#fad52f</color>
+
+    <color name="shortcut_card_icon_bg">#78909C</color>
+
+    <!-- Black 87% -->
+    <color name="primary_text_light">#de000000</color>
+    <!-- Black 54% -->
+    <color name="secondary_text_light">#8a000000</color>
+
+    <!-- White 87% -->
+    <color name="primary_text_dark">#deffffff</color>
+    <!-- White 38% -->
+    <color name="secondary_text_dark">#61ffffff</color>
+
+    <color name="item_simple_task_card_done_mask_bg">#4C000000</color>
+    <color name="item_simple_task_card_done_icon_bg">#78909C</color>
+
+    <!-- Black 20% -->
+    <color name="form_transparent_divider">#33000000</color>
+
+    <!-- Note Theme Color  -->
+
+    <color name="task_theme_color_red">#F44336</color>
+    <color name="task_theme_color_pink">#E91E63</color>
+    <color name="task_theme_color_purple">#9C27B0</color>
+    <color name="task_theme_color_deep_purple">#673AB7</color>
+    <color name="task_theme_color_indigo">#3F51B5</color>
+    <color name="task_theme_color_blue">#1E88E5</color>
+    <color name="task_theme_color_teal">#009688</color>
+    <color name="task_theme_color_green">#388E3C</color>
+    <color name="task_theme_color_light_green">#33691E</color>
+    <color name="task_theme_color_lime">#827717</color>
+    <color name="task_theme_color_amber">#FFC107</color>
+    <color name="task_theme_color_orange">#E65100</color>
+
+    <color name="default_task_theme_color">@color/task_theme_color_teal</color>
+
+    <array name="task_theme_colors">
+        <item>@color/task_theme_color_red</item>
+        <item>@color/task_theme_color_pink</item>
+        <item>@color/task_theme_color_purple</item>
+        <item>@color/task_theme_color_deep_purple</item>
+        <item>@color/task_theme_color_indigo</item>
+        <item>@color/task_theme_color_blue</item>
+        <item>@color/task_theme_color_teal</item>
+        <item>@color/task_theme_color_green</item>
+        <item>@color/task_theme_color_light_green</item>
+        <item>@color/task_theme_color_lime</item>
+        <item>@color/task_theme_color_amber</item>
+        <item>@color/task_theme_color_orange</item>
+    </array>
+
+</resources>
