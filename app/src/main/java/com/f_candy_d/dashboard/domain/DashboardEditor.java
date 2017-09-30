@@ -32,8 +32,16 @@ public class DashboardEditor {
         }
     }
 
-    public String onGetTitle() {
+    public String getTitle() {
         return mDashboard.getTitle();
+    }
+
+    public void onInputThemeColor(int color) {
+        mDashboard.setThemeColor(color);
+    }
+
+    public int getThemeColor() {
+        return mDashboard.getThemeColor();
     }
 
     public void onSave() {

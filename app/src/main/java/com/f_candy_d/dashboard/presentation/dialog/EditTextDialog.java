@@ -2,7 +2,6 @@ package com.f_candy_d.dashboard.presentation.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,10 +21,13 @@ import com.f_candy_d.dashboard.R;
 
 public class EditTextDialog extends DialogFragment {
 
-    public interface NoticeListener {
+    public interface TextChangeListener {
+        void onTextChange(String text);
+    }
+
+    public interface ButtonClickListener {
         void onPositiveButtonClick(int tag, String text);
         void onNegativeButtonClick(int tag, String text);
-        void onTextChange(String text);
     }
 
     private static final String ARG_TITLE = "arg_title";
@@ -34,17 +36,19 @@ public class EditTextDialog extends DialogFragment {
     private static final String ARG_POSITIVE_BUTTON_TITLE = "arg_positive_button_title";
     private static final String ARG_TAG = "arg_tag";
     private static final String ARG_EDIT_TEXT_HINT = "arg_edit_text_hint";
+    private static final String ARG_EDIT_TEXT = "arg_edit_text";
 
-    private NoticeListener mListener;
     private String mTitle;
     private String mMessage;
     private String mNegativeButtonTitle;
     private String mPositiveButtonTitle;
-    private String mEditTextHint;
     private int mTag;
 
+    private TextChangeListener mTextChangeListener;
+    private ButtonClickListener mButtonClickListener;
+
     public static EditTextDialog newInstance
-            (String title, String message, String positiveButtonTitle, String negativeButtonTitle, String editTextHint, int tag) {
+            (String title, String message, String positiveButtonTitle, String negativeButtonTitle, String editTextHint, String editText,int tag) {
 
         Bundle bundle = new Bundle();
         bundle.putString(ARG_TITLE, title);
@@ -52,6 +56,7 @@ public class EditTextDialog extends DialogFragment {
         bundle.putString(ARG_NEGATIVE_BUTTON_TITLE, negativeButtonTitle);
         bundle.putString(ARG_POSITIVE_BUTTON_TITLE, positiveButtonTitle);
         bundle.putString(ARG_EDIT_TEXT_HINT, editTextHint);
+        bundle.putString(ARG_EDIT_TEXT, editText);
         bundle.putInt(ARG_TAG, tag);
 
         EditTextDialog fragment = new EditTextDialog();
@@ -67,7 +72,6 @@ public class EditTextDialog extends DialogFragment {
             mMessage = getArguments().getString(ARG_MESSAGE, null);
             mNegativeButtonTitle = getArguments().getString(ARG_NEGATIVE_BUTTON_TITLE, null);
             mPositiveButtonTitle = getArguments().getString(ARG_POSITIVE_BUTTON_TITLE, null);
-            mEditTextHint = getArguments().getString(ARG_EDIT_TEXT_HINT, null);
             mTag = getArguments().getInt(ARG_TAG);
         }
     }
@@ -86,13 +90,17 @@ public class EditTextDialog extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                mListener.onTextChange(editable.toString());
+                if (mTextChangeListener != null) {
+                    mTextChangeListener.onTextChange(editable.toString());
+                }
             }
         });
 
-        if (mEditTextHint != null) {
+        if (getArguments() != null) {
+            inputEditText.setText(getArguments().getString(ARG_EDIT_TEXT, null));
             TextInputLayout inputLayout = content.findViewById(R.id.text_input_layout);
-            inputLayout.setHint(mEditTextHint);
+            inputLayout.setHint(getArguments().getString(ARG_EDIT_TEXT_HINT, null));
+
         }
 
         if (mTitle != null) {
@@ -107,7 +115,9 @@ public class EditTextDialog extends DialogFragment {
             builder.setPositiveButton(mPositiveButtonTitle, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    mListener.onPositiveButtonClick(mTag, inputEditText.getText().toString());
+                    if (mButtonClickListener != null) {
+                        mButtonClickListener.onPositiveButtonClick(mTag, inputEditText.getText().toString());
+                    }
                 }
             });
         }
@@ -116,7 +126,9 @@ public class EditTextDialog extends DialogFragment {
             builder.setNegativeButton(mNegativeButtonTitle, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    mListener.onNegativeButtonClick(mTag, inputEditText.getText().toString());
+                    if (mButtonClickListener != null) {
+                        mButtonClickListener.onNegativeButtonClick(mTag, inputEditText.getText().toString());
+                    }
                 }
             });
         }
@@ -124,15 +136,12 @@ public class EditTextDialog extends DialogFragment {
         return builder.create();
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (NoticeListener) context;
-        } catch (ClassCastException e) {
-            throw new RuntimeException(context.toString()
-                    + " must implement EditTextDialog.NoticeListener interface");
-        }
+    public void setTextChangeListener(TextChangeListener textChangeListener) {
+        mTextChangeListener = textChangeListener;
+    }
+
+    public void setButtonClickListener(ButtonClickListener buttonClickListener) {
+        mButtonClickListener = buttonClickListener;
     }
 
     /**
@@ -146,7 +155,10 @@ public class EditTextDialog extends DialogFragment {
         private String mNegativeButtonTitle;
         private String mPositiveButtonTitle;
         private String mEditTextHint;
+        private String mEditText;
         private int mTag;
+        private TextChangeListener mTextChangeListener;
+        private ButtonClickListener mButtonClickListener;
 
         public Builder title(String title) {
             mTitle = title;
@@ -173,19 +185,40 @@ public class EditTextDialog extends DialogFragment {
             return this;
         }
 
+        public Builder editText(String text) {
+            mEditText = text;
+            return this;
+        }
+
         public Builder tag(int tag) {
             mTag = tag;
             return this;
         }
 
+        public Builder textChangeListener(TextChangeListener listener) {
+            mTextChangeListener = listener;
+            return this;
+        }
+
+        public Builder buttonClickListener(ButtonClickListener listener) {
+            mButtonClickListener = listener;
+            return this;
+        }
+
         public EditTextDialog create() {
-            return EditTextDialog.newInstance(
+            EditTextDialog dialog = EditTextDialog.newInstance(
                     mTitle,
                     mMessage,
                     mPositiveButtonTitle,
                     mNegativeButtonTitle,
                     mEditTextHint,
+                    mEditText,
                     mTag);
+
+            dialog.setTextChangeListener(mTextChangeListener);
+            dialog.setButtonClickListener(mButtonClickListener);
+
+            return dialog;
         }
     }
 }

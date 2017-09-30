@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">@color/google_settings_app_color_primary</color>
     <color name="colorPrimaryDark">@color/google_settings_app_color_primary_dark</color>
-    <color name="colorAccent">@color/google_settings_app_color_primary</color>
+    <color name="colorAccent">@color/google_settings_app_color_primary_dark</color>
 
     <color name="home_toolbar_background">@color/system_light_bg</color>
     <color name="home_toolbar_title">@color/primary_text_light</color>

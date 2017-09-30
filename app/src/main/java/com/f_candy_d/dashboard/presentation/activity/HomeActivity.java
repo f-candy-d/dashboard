@@ -13,7 +13,9 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.f_candy_d.dashboard.R;
+import com.f_candy_d.dashboard.domain.Dashboard;
 import com.f_candy_d.dashboard.domain.DashboardLoader;
+import com.f_candy_d.dashboard.presentation.ItemClickHelper;
 import com.f_candy_d.dashboard.presentation.adapter.DashboardAdapter;
 
 public class HomeActivity extends AppCompatActivity {
@@ -57,8 +59,24 @@ public class HomeActivity extends AppCompatActivity {
         // # Recycler View
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(SINGLE_SPAN_COUNT, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(MULTIPLE_SPAN_COUNT, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(mDashboardAdapter);
+
+        // # ItemClickHelper
+
+        ItemClickHelper<DashboardAdapter.ViewHolder> itemClickHelper =
+                new ItemClickHelper<>(new ItemClickHelper.Callback<DashboardAdapter.ViewHolder>() {
+            @Override
+            public void onItemClick(DashboardAdapter.ViewHolder viewHolder) {
+                Dashboard dashboard = mDashboardLoader.get(viewHolder.getAdapterPosition());
+                launchDashboardEditor(dashboard.getId());
+            }
+
+            @Override
+            public void onItemLongClick(DashboardAdapter.ViewHolder viewHolder) {}
+        });
+
+        itemClickHelper.attachToRecyclerView(recyclerView);
 
         // # Bottom Tools
 
@@ -72,6 +90,13 @@ public class HomeActivity extends AppCompatActivity {
 
     private void launchDashboardEditor() {
         Intent intent = new Intent(this, DashboardEditorActivity.class);
+        intent.putExtras(DashboardEditorActivity.makeExtras(true));
+        startActivity(intent);
+    }
+
+    private void launchDashboardEditor(long id) {
+        Intent intent = new Intent(this, DashboardEditorActivity.class);
+        intent.putExtras(DashboardEditorActivity.makeExtras(id, false));
         startActivity(intent);
     }
 }

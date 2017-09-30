@@ -15,6 +15,7 @@ public class Dashboard extends SqliteStreamEntity {
 
     private String mTitle;
     private boolean mIsArchived;
+    private int mThemeColor;
 
     @Nullable
     public static Dashboard createIfPossible(long id) {
@@ -39,6 +40,7 @@ public class Dashboard extends SqliteStreamEntity {
         SqlEntity entity = new SqlEntity(DashboardTable.TABLE_NAME);
         entity.put(DashboardTable._TITLE, mTitle);
         entity.put(DashboardTable._IS_ARCHIVED, mIsArchived);
+        entity.put(DashboardTable._THEME_COLOR, mThemeColor);
         return entity;
     }
 
@@ -46,12 +48,14 @@ public class Dashboard extends SqliteStreamEntity {
     protected void constructFromSqlEntity(@NonNull SqlEntity entity) {
         mTitle = entity.getStringOrDefault(DashboardTable._TITLE, mTitle);
         mIsArchived = entity.getBooleanOrDefault(DashboardTable._IS_ARCHIVED, mIsArchived);
+        mThemeColor = entity.getIntOrDefault(DashboardTable._THEME_COLOR, mThemeColor);
     }
 
     @Override
     public void initializeWithDefaultColumnValues() {
         mTitle = DashboardTable.defaultTitle();
         mIsArchived = DashboardTable.defaultIsArchived();
+        mThemeColor = DashboardTable.defaultThemeColor();
     }
 
     @Override
@@ -67,6 +71,7 @@ public class Dashboard extends SqliteStreamEntity {
         Dashboard dashboard = (Dashboard) o;
 
         if (mIsArchived != dashboard.mIsArchived) return false;
+        if (mThemeColor != dashboard.mThemeColor) return false;
         return mTitle != null ? mTitle.equals(dashboard.mTitle) : dashboard.mTitle == null;
 
     }
@@ -75,6 +80,7 @@ public class Dashboard extends SqliteStreamEntity {
     public int hashCode() {
         int result = mTitle != null ? mTitle.hashCode() : 0;
         result = 31 * result + (mIsArchived ? 1 : 0);
+        result = 31 * result + mThemeColor;
         return result;
     }
 
@@ -96,5 +102,13 @@ public class Dashboard extends SqliteStreamEntity {
 
     public void setArchived(boolean archived) {
         mIsArchived = archived;
+    }
+
+    public int getThemeColor() {
+        return mThemeColor;
+    }
+
+    public void setThemeColor(int themeColor) {
+        mThemeColor = themeColor;
     }
 }

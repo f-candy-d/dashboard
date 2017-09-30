@@ -1,11 +1,14 @@
 package com.f_candy_d.dashboard.presentation.adapter;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.f_candy_d.dashboard.R;
+import com.f_candy_d.dashboard.domain.Dashboard;
 import com.f_candy_d.dashboard.domain.DashboardLoader;
 import com.f_candy_d.infra.sqlite.SqliteEntityLoader;
 
@@ -51,6 +54,9 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Dashboard dashboard = mLoader.get(position);
+        holder.background.setCardBackgroundColor(dashboard.getThemeColor());
+        holder.title.setText(dashboard.getTitle());
     }
 
     @Override
@@ -62,10 +68,15 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
      * VIEW HOLDER
      * ----------------------------------------------------------------------------- */
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        CardView background;
+        TextView title;
 
         ViewHolder(View view) {
             super(view);
+            background = view.findViewById(R.id.background);
+            title = view.findViewById(R.id.title);
         }
     }
 }

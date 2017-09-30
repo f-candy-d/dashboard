@@ -1,5 +1,7 @@
 package com.f_candy_d.dashboard.data_store;
 
+import android.graphics.Color;
+
 import com.f_candy_d.infra.sqlite.SqliteBaseTable;
 import com.f_candy_d.infra.sqlite.SqliteColumnDataType;
 import com.f_candy_d.infra.sqlite.SqliteTableUtils;
@@ -20,6 +22,7 @@ public class DashboardTable extends SqliteBaseTable {
 
     public static final String _TITLE = "title";
     public static final String _IS_ARCHIVED = "is_archived";
+    public static final String _THEME_COLOR = "theme_color";
 
     /**
      * TABLE DEFINITION
@@ -28,7 +31,8 @@ public class DashboardTable extends SqliteBaseTable {
     static SqliteTableUtils.TableSource getTableSource() {
         return getBaseTableSource(TABLE_NAME)
                 .put(_TITLE, SqliteColumnDataType.TEXT)
-                .put(_IS_ARCHIVED, SqliteColumnDataType.INTEGER);
+                .put(_IS_ARCHIVED, SqliteColumnDataType.INTEGER)
+                .put(_THEME_COLOR, SqliteColumnDataType.INTEGER);
     }
 
     /**
@@ -41,5 +45,10 @@ public class DashboardTable extends SqliteBaseTable {
 
     public static boolean defaultIsArchived() {
         return false;
+    }
+
+    public static int defaultThemeColor() {
+        // @color/task_theme_color_indigo
+        return Color.parseColor("#3F51B5");
     }
 }
