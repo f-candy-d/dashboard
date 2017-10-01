@@ -1,8 +1,9 @@
-package com.f_candy_d.dashboard.domain;
+package com.f_candy_d.dashboard.domain.loader;
 
 import android.support.annotation.Nullable;
 
 import com.f_candy_d.dashboard.data_store.DashboardTable;
+import com.f_candy_d.dashboard.domain.structure.Dashboard;
 import com.f_candy_d.infra.Repository;
 import com.f_candy_d.infra.sql_utils.SqlEntity;
 import com.f_candy_d.infra.sql_utils.SqlQuery;

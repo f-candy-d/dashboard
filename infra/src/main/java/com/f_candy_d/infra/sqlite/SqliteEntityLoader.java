@@ -140,7 +140,17 @@ abstract public class SqliteEntityLoader<T extends SqliteStreamEntity> {
         return INVALID_INDEX;
     }
 
-    final public int getloadedItemCount() {
+    final public int indexOf(T entity) {
+        for (int i = 0; i < mEntites.size(); ++i) {
+            if (areEntitesTheSame(mEntites.get(i), entity)) {
+                return i;
+            }
+        }
+
+        return INVALID_INDEX;
+    }
+
+    final public int getLoadedItemCount() {
         return mEntites.size();
     }
 

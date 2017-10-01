@@ -16,7 +16,8 @@ final public class DbContract {
     @NonNull
     public static SqliteTableUtils.TableSource[] getTableSources() {
         return new SqliteTableUtils.TableSource[] {
-                DashboardTable.getTableSource()
+                DashboardTable.getTableSource(),
+                TextNoteTable.getTableSource()
         };
     }
 }

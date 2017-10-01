@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.f_candy_d.dashboard.R;
-import com.f_candy_d.dashboard.domain.Dashboard;
-import com.f_candy_d.dashboard.domain.DashboardLoader;
+import com.f_candy_d.dashboard.domain.structure.Dashboard;
+import com.f_candy_d.dashboard.domain.loader.DashboardLoader;
 import com.f_candy_d.infra.sqlite.SqliteEntityLoader;
 
 /**
@@ -61,7 +61,7 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
 
     @Override
     public int getItemCount() {
-        return mLoader.getloadedItemCount();
+        return mLoader.getLoadedItemCount();
     }
 
     /**

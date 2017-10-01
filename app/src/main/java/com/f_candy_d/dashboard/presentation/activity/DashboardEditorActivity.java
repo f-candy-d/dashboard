@@ -19,7 +19,6 @@ import com.android.colorpicker.ColorPickerDialog;
 import com.android.colorpicker.ColorPickerSwatch;
 import com.f_candy_d.dashboard.R;
 import com.f_candy_d.dashboard.data_store.DashboardTable;
-import com.f_candy_d.dashboard.domain.Dashboard;
 import com.f_candy_d.dashboard.domain.DashboardEditor;
 import com.f_candy_d.dashboard.presentation.dialog.EditTextDialog;
 import com.f_candy_d.dashboard.utils.ColorUtils;

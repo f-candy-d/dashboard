@@ -2,6 +2,8 @@ package com.f_candy_d.dashboard.domain;
 
 import android.support.annotation.NonNull;
 
+import com.f_candy_d.dashboard.domain.structure.Dashboard;
+
 /**
  * Created by daichi on 9/30/17.
  */

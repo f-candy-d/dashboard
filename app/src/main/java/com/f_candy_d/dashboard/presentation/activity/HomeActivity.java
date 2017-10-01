@@ -13,8 +13,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.f_candy_d.dashboard.R;
-import com.f_candy_d.dashboard.domain.Dashboard;
-import com.f_candy_d.dashboard.domain.DashboardLoader;
+import com.f_candy_d.dashboard.domain.structure.Dashboard;
+import com.f_candy_d.dashboard.domain.loader.DashboardLoader;
 import com.f_candy_d.dashboard.presentation.ItemClickHelper;
 import com.f_candy_d.dashboard.presentation.adapter.DashboardAdapter;
 

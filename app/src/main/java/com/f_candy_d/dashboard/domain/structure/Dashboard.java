@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.domain;
+package com.f_candy_d.dashboard.domain.structure;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
