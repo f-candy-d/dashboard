@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.android.colorpicker.ColorPickerDialog;
 import com.android.colorpicker.ColorPickerSwatch;
 import com.f_candy_d.dashboard.R;
-import com.f_candy_d.dashboard.data_store.DashboardTable;
+import com.f_candy_d.dashboard.data.source.Repository;
 import com.f_candy_d.dashboard.domain.DashboardEditor;
 import com.f_candy_d.dashboard.presentation.dialog.EditTextDialog;
 import com.f_candy_d.dashboard.utils.ColorUtils;
@@ -58,8 +58,8 @@ public class DashboardEditorActivity extends AppCompatActivity
 
         // Initialization
         mIsActivityOnFirstRun = (savedInstanceState == null);
-        long id = getIntent().getLongExtra(KEY_DASHBOARD_ID, DashboardTable.defaultId());
-        if (id != DashboardTable.defaultId()) {
+        long id = getIntent().getLongExtra(KEY_DASHBOARD_ID, Repository.INVALID_ID);
+        if (id != Repository.INVALID_ID) {
             mDashboardEditor = new DashboardEditor(this, id);
         } else {
             mDashboardEditor = new DashboardEditor(this);

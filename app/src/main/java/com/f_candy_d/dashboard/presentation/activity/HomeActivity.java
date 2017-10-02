@@ -2,6 +2,7 @@ package com.f_candy_d.dashboard.presentation.activity;
 
 import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,17 +14,20 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.f_candy_d.dashboard.R;
-import com.f_candy_d.dashboard.domain.structure.Dashboard;
-import com.f_candy_d.dashboard.domain.loader.DashboardLoader;
+import com.f_candy_d.dashboard.data.model.Dashboard;
+import com.f_candy_d.dashboard.data.source.DataSource;
+import com.f_candy_d.dashboard.data.source.Repository;
 import com.f_candy_d.dashboard.presentation.ItemClickHelper;
 import com.f_candy_d.dashboard.presentation.adapter.DashboardAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
     private static final int SINGLE_SPAN_COUNT = 1;
     private static final int MULTIPLE_SPAN_COUNT = 2;
 
-    private DashboardLoader mDashboardLoader;
     private DashboardAdapter mDashboardAdapter;
 
     @Override
@@ -32,9 +36,19 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         // Initialization
-        mDashboardLoader = new DashboardLoader();
-        mDashboardLoader.loadIf(null);
-        mDashboardAdapter = new DashboardAdapter(mDashboardLoader);
+        Repository.getInstance().loadAllDashboards(
+                new DataSource.LoadALotOfDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataLoaded(@NonNull List<Dashboard> data) {
+                        mDashboardAdapter = new DashboardAdapter(data);
+                    }
+                },
+                new DataSource.OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        mDashboardAdapter = new DashboardAdapter(new ArrayList<Dashboard>());
+                    }
+                });
 
         onCreateUI();
     }
@@ -68,7 +82,7 @@ public class HomeActivity extends AppCompatActivity {
                 new ItemClickHelper<>(new ItemClickHelper.Callback<DashboardAdapter.ViewHolder>() {
             @Override
             public void onItemClick(DashboardAdapter.ViewHolder viewHolder) {
-                Dashboard dashboard = mDashboardLoader.get(viewHolder.getAdapterPosition());
+                Dashboard dashboard = mDashboardAdapter.getAt(viewHolder.getAdapterPosition());
                 launchDashboardEditor(dashboard.getId());
             }
 

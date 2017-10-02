@@ -1,10 +1,10 @@
-package com.f_candy_d.dashboard.data.source.local.sqlite_utils;
+package com.f_candy_d.sqliteutils;
 
 /**
  * Created by daichi on 17/08/30.
  */
 
-public enum SqliteColumnDataType {
+public enum ColumnDataType {
 
     INTEGER("INTEGER"),
     INTEGER_PK("INTEGER PRIMARY KEY"),
@@ -14,7 +14,7 @@ public enum SqliteColumnDataType {
 
     private final String mString;
 
-    SqliteColumnDataType(String string) {
+    ColumnDataType(String string) {
         mString = string;
     }
 

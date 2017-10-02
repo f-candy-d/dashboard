@@ -2,7 +2,7 @@ package com.f_candy_d.dashboard.data_store;
 
 import android.support.annotation.NonNull;
 
-import com.f_candy_d.dashboard.data.source.local.sqlite_utils.SqliteTableUtils;
+import com.f_candy_d.infra.sqlite.SqliteTableUtils;
 
 /**
  * Created by daichi on 17/08/30.

@@ -6,7 +6,7 @@ import com.f_candy_d.dashboard.data.source.DataSource;
  * Created by daichi on 10/1/17.
  */
 
-abstract class Entity {
+abstract public class Entity {
 
     public static long DEFAULT_ID = DataSource.INVALID_ID;
 
@@ -26,4 +26,10 @@ abstract class Entity {
     public long getId() {
         return mId;
     }
+
+    @Override
+    abstract public int hashCode();
+
+    @Override
+    abstract public boolean equals(Object obj);
 }

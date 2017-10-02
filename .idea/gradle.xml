@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/colorpicker" />
             <option value="$PROJECT_DIR$/infra" />
+            <option value="$PROJECT_DIR$/sqliteutils" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

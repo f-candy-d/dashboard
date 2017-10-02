@@ -32,6 +32,29 @@ public class Dashboard extends Entity {
         mThemeColor = themeColor;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Dashboard dashboard = (Dashboard) o;
+
+        if (mIsArchived != dashboard.mIsArchived) return false;
+        if (mThemeColor != dashboard.mThemeColor) return false;
+        if (mTitle != null ? !mTitle.equals(dashboard.mTitle) : dashboard.mTitle != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mTitle != null ? mTitle.hashCode() : 0;
+        result = 31 * result + (mIsArchived ? 1 : 0);
+        result = 31 * result + mThemeColor;
+        return result;
+    }
+
     /**
      * GETTER
      * ----------------------------------------------------------------------------- */
@@ -54,10 +77,32 @@ public class Dashboard extends Entity {
 
     public static class Builder {
 
-        private long mId = DEFAULT_ID;
-        private String mTitle = DEFAULT_TITLE;
-        private boolean mIsArchived = DEFAULT_IS_ARCHIVED;
-        private int mThemeColor = DEFAULT_THEME_COLOR;
+        private long mId;
+        private String mTitle;
+        private boolean mIsArchived;
+        private int mThemeColor;
+
+        public Builder() {
+            reset();
+        }
+
+        public Builder(Dashboard source) {
+            if (source != null) {
+                mId = source.getId();
+                mTitle = source.getTitle();
+                mIsArchived = source.isArchived();
+                mThemeColor = source.getThemeColor();
+            } else {
+                reset();
+            }
+        }
+
+        public void reset() {
+            mId = DEFAULT_ID;
+            mTitle = DEFAULT_TITLE;
+            mIsArchived = DEFAULT_IS_ARCHIVED;
+            mThemeColor = DEFAULT_THEME_COLOR;
+        }
 
         public Builder id(long id) {
             mId = id;

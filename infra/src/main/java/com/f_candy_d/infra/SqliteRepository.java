@@ -5,14 +5,15 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.f_candy_d.infra.sql_utils.SqlCondExpr;
 import com.f_candy_d.infra.sql_utils.SqlEntity;
-import com.f_candy_d.infra.sql_utils.SqlQuery;
 import com.f_candy_d.infra.sql_utils.SqlWhere;
+import com.f_candy_d.sqliteutils.QueryBuilder;
 
 import java.util.ArrayList;
 
@@ -125,19 +126,21 @@ public class SqliteRepository {
      * @return An array which contains results of finding, or an empty array
      */
     @NonNull
-    public SqlEntity[] select(@NonNull SqlQuery query) {
+    public SqlEntity[] select(@NonNull QueryBuilder queryBuilder) {
         ArrayList<SqlEntity> results = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = mOpenHelper.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.query(
-                query.distinct(),
-                query.tables(),
-                query.columns(),
-                query.selection(),
-                query.selectionArgs(),
-                query.groupBy(),
-                query.having(),
-                query.orderBy(),
-                query.limit());
+//        Cursor cursor = sqLiteDatabase.query(
+//                query.distinct(),
+//                query.tables(),
+//                query.columns(),
+//                query.selection(),
+//                query.selectionArgs(),
+//                query.groupBy(),
+//                query.having(),
+//                query.orderBy(),
+//                query.limit());
+
+        Cursor cursor = queryBuilder.query(sqLiteDatabase);
 
         boolean isEOF = cursor.moveToFirst();
         ContentValues contentValues;
@@ -169,11 +172,15 @@ public class SqliteRepository {
         }
 
         SqlCondExpr idIs = new SqlCondExpr(BaseColumns._ID).equalTo(id);
-        SqlQuery query = new SqlQuery();
-        query.putTables(table);
-        query.setSelection(idIs);
+//        SqlQuery query = new SqlQuery();
+//        query.putTables(table);
+//        query.setSelection(idIs);
 
-        SqlEntity[] results = select(query);
+        QueryBuilder queryBuilder = new QueryBuilder();
+        queryBuilder.table(table).whereColumnEquals(BaseColumns._ID, id);
+
+//        SqlEntity[] results = select(query);
+        SqlEntity[] results = select(queryBuilder);
         if (results.length == 1) {
             return results[0];
         }

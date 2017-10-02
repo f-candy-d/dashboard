@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.data.source.local.sqlite_utils;
+package com.f_candy_d.sqliteutils;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
@@ -12,11 +12,11 @@ import java.util.Set;
  * Created by daichi on 17/08/30.
  */
 
-public class SqliteTableUtils {
+public class TableUtils {
 
     public static class TableSource {
         // key -> columnName | value -> dataType
-        @NonNull private Map<String, SqliteColumnDataType> mPairMap;
+        @NonNull private Map<String, ColumnDataType> mPairMap;
         private String mTableName;
 
         public TableSource(String tableName) {
@@ -32,12 +32,12 @@ public class SqliteTableUtils {
             mTableName = tableName;
         }
 
-        public TableSource put(@NonNull String column, @NonNull SqliteColumnDataType dataType) {
+        public TableSource put(@NonNull String column, @NonNull ColumnDataType dataType) {
             mPairMap.put(column, dataType);
             return this;
         }
 
-        public SqliteColumnDataType getDataType(@NonNull String column) {
+        public ColumnDataType getDataType(@NonNull String column) {
             return mPairMap.get(column);
         }
 
@@ -55,7 +55,7 @@ public class SqliteTableUtils {
         }
     }
 
-    private SqliteTableUtils() {}
+    private TableUtils() {}
 
     public static boolean createTable(@NonNull SQLiteDatabase database, @NonNull TableSource source) {
         if (!database.isOpen() || database.isReadOnly()) {

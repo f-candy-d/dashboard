@@ -36,5 +36,6 @@ dependencies {
     compile 'com.google.guava:guava:23.0-android'
     compile project(':infra')
     compile project(':colorpicker')
+    compile project(':sqliteutils')
     testCompile 'junit:junit:4.12'
 }

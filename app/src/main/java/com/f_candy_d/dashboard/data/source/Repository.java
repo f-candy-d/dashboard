@@ -2,7 +2,6 @@ package com.f_candy_d.dashboard.data.source;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 
 import com.f_candy_d.dashboard.data.model.Dashboard;
@@ -10,7 +9,6 @@ import com.f_candy_d.dashboard.data.source.local.SqliteDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -43,99 +41,183 @@ public class Repository implements DataSource {
     private LongSparseArray<Dashboard> mDashboardCache;
 
     @Override
-    public void loadDashboard(long id, @NonNull final LoadDashboardCallback callback) {
+    public void loadDashboard(long id, final LoadDataCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
         Dashboard cached = mDashboardCache.get(id);
         if (mDashboardCache != null && cached != null) {
-            checkNotNull(callback).onDashboardLoaded(cached);
+            if (loadCallback != null) {
+                loadCallback.onDataLoaded(cached);
+            }
             return;
         }
 
-        mLocalDataSource.loadDashboard(id, new LoadDashboardCallback() {
-            @Override
-            public void onDashboardLoaded(@NonNull Dashboard dashboard) {
-                cacheDashboard(dashboard);
-                checkNotNull(callback).onDashboardLoaded(dashboard);
-            }
-
-            @Override
-            public void onDataNotFound() {
-                checkNotNull(callback).onDataNotFound();
-            }
-        });
+        mLocalDataSource.loadDashboard(id, 
+                new LoadDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataLoaded(@NonNull Dashboard data) {
+                        cacheDashboard(data);
+                        if (loadCallback != null) {
+                            loadCallback.onDataLoaded(data);
+                        }
+                    }
+                },
+                new OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        if (failedCallback != null) {
+                            failedCallback.onFailed();
+                        }
+                    }
+                });
     }
 
     @Override
-    public void loadAllDashboards(@NonNull final LoadDashboardsCallback callback) {
-        mLocalDataSource.loadAllDashboards(new LoadDashboardsCallback() {
-            @Override
-            public void onDashboardsLoaded(@NonNull List<Dashboard> dashboards) {
-                cacheDashboards(dashboards);
-                checkNotNull(callback).onDashboardsLoaded(dashboards);
-            }
-
-            @Override
-            public void onDataNotFound() {
-                checkNotNull(callback).onDataNotFound();
-            }
-        });
+    public void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback) {
+        loadDashboard(id, loadCallback, null);
+    }
+    
+    @Override
+    public void loadAllDashboards(final LoadALotOfDataCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.loadAllDashboards(
+                new LoadALotOfDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataLoaded(@NonNull List<Dashboard> data) {
+                        cacheDashboards(data);
+                        if (loadCallback != null) {
+                            loadCallback.onDataLoaded(data);
+                        }
+                    }
+                },
+                new OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        if (failedCallback != null) {
+                            failedCallback.onFailed();
+                        }
+                    }
+                });
     }
 
     @Override
-    public void saveDashboard(@NonNull final Dashboard dashboard, @Nullable final OperationFailedCallback callback) {
-        mLocalDataSource.saveDashboard(checkNotNull(dashboard), new OperationFailedCallback() {
-            @Override
-            public boolean onOperationFailed() {
-                releaseCachedDashboard(dashboard);
-                return (callback != null && callback.onOperationFailed());
-            }
-        });
-
-        cacheDashboard(dashboard);
+    public void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback) {
+        loadAllDashboards(loadCallback, null);
     }
 
     @Override
-    public void saveDashboards(@NonNull final Collection<Dashboard> dashboards, @Nullable final OperationFailedCallback callback) {
-        cacheDashboards(checkNotNull(dashboards));
-        mLocalDataSource.saveDashboards(dashboards, new OperationFailedCallback() {
-            @Override
-            public boolean onOperationFailed() {
-                releaseCachedDashboards(dashboards);
-                return (callback != null && callback.onOperationFailed());
-            }
-        });
+    public void saveDashboard(@NonNull final Dashboard dashboard, final SaveDataCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.saveDashboard(checkNotNull(dashboard),
+                new SaveDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataSaved(@NonNull Dashboard data) {
+                        cacheDashboard(data);
+                        if (saveCallback != null) {
+                            saveCallback.onDataSaved(data);
+                        }
+                    }
+                },
+                new OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        if (failedCallback != null) {
+                            failedCallback.onFailed();
+                        }
+                    }
+                });
     }
 
     @Override
-    public void deleteDashboard(@NonNull Dashboard dashboard, @Nullable final OperationFailedCallback callback) {
-        releaseCachedDashboard(checkNotNull(dashboard));
-        mLocalDataSource.deleteDashboard(dashboard, new OperationFailedCallback() {
-            @Override
-            public boolean onOperationFailed() {
-                return (callback != null && callback.onOperationFailed());
-            }
-        });
+    public void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback) {
+        saveDashboard(dashboard, saveCallback, null);
     }
 
     @Override
-    public void deleteDashboards(@NonNull Collection<Dashboard> dashboards, @Nullable final OperationFailedCallback callback) {
-        releaseCachedDashboards(checkNotNull(dashboards));
-        mLocalDataSource.deleteDashboards(dashboards, new OperationFailedCallback() {
-            @Override
-            public boolean onOperationFailed() {
-                return (callback != null && callback.onOperationFailed());
-            }
-        });
+    public void saveDashboards(@NonNull final List<Dashboard> dashboards, boolean revertIfError, final SaveALotOfDataCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.saveDashboards(checkNotNull(dashboards), revertIfError,
+                new SaveALotOfDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataSaved(@NonNull List<Dashboard> data) {
+                        releaseCachedDashboards(data);
+                        if (saveCallback != null) {
+                            saveCallback.onDataSaved(data);
+                        }
+                    }
+                },
+                new OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        if (failedCallback != null) {
+                            failedCallback.onFailed();
+                        }
+                    }
+                });
     }
 
     @Override
-    public void deleteAllDashboards(@Nullable final OperationFailedCallback callback) {
-        clearDashboardCache();
-        mLocalDataSource.deleteAllDashboards(new OperationFailedCallback() {
-            @Override
-            public boolean onOperationFailed() {
-                return (callback != null && callback.onOperationFailed());
-            }
-        });
+    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback) {
+        saveDashboards(dashboards, revertIfError, saveCallback, null);
+    }
+
+    @Override
+    public void saveDashboards(@NonNull List<Dashboard> dashboards, SaveALotOfDataCallback<Dashboard> saveCallback) {
+        saveDashboards(dashboards, true, saveCallback, null);
+    }
+    
+    @Override
+    public void deleteDashboard(@NonNull final Dashboard dashboard, final DeleteDataCallback<Dashboard> deleteDataCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.deleteDashboard(checkNotNull(dashboard),
+                new DeleteDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataDeleted(@NonNull Dashboard data) {
+                        releaseCachedDashboard(dashboard);
+                        if (deleteDataCallback != null) {
+                            deleteDataCallback.onDataDeleted(data);
+                        }
+                    }
+                },
+                new OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        if (failedCallback != null) {
+                            failedCallback.onFailed();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void deleteDashboard(@NonNull Dashboard dashboard, OperationFailedCallback failedCallback) {
+        deleteDashboard(dashboard, null, failedCallback);
+    }
+
+    @Override
+    public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, final DeleteALotOfDataCallback<Dashboard> deleteCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.deleteDashboards(checkNotNull(dashboards), revertIfError,
+                new DeleteALotOfDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataDelete(@NonNull List<Dashboard> data) {
+                        releaseCachedDashboards(data);
+                        if (deleteCallback != null) {
+                            deleteCallback.onDataDelete(data);
+                        }
+                    }
+                },
+                new OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        if (failedCallback != null) {
+                            failedCallback.onFailed();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, OperationFailedCallback failedCallback) {
+        deleteDashboards(dashboards, revertIfError, null, failedCallback);
+    }
+
+    @Override
+    public void deleteDashboards(@NonNull List<Dashboard> dashboards, OperationFailedCallback failedCallback) {
+        deleteDashboards(dashboards, true, null, failedCallback);
     }
 
     private void cacheDashboard(@NonNull Dashboard dashboard) {
@@ -145,7 +227,7 @@ public class Repository implements DataSource {
         mDashboardCache.put(dashboard.getId(), dashboard);
     }
 
-    private void cacheDashboards(@NonNull Collection<Dashboard> dashboards) {
+    private void cacheDashboards(@NonNull List<Dashboard> dashboards) {
         if (mDashboardCache == null) {
             mDashboardCache = new LongSparseArray<>();
         }
@@ -164,7 +246,7 @@ public class Repository implements DataSource {
         }
     }
 
-    private void releaseCachedDashboards(@NonNull Collection<Dashboard> dashboards) {
+    private void releaseCachedDashboards(@NonNull List<Dashboard> dashboards) {
         if (mDashboardCache != null) {
             for (Dashboard dashboard : dashboards) {
                 mDashboardCache.remove(dashboard.getId());

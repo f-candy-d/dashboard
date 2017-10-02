@@ -1,11 +1,10 @@
 package com.f_candy_d.dashboard.data.source;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.f_candy_d.dashboard.data.model.Dashboard;
+import com.f_candy_d.dashboard.data.model.Entity;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -16,30 +15,57 @@ public interface DataSource {
 
     long INVALID_ID = -1;
 
+    interface LoadDataCallback<T extends Entity> {
+        void onDataLoaded(@NonNull T data);
+    }
+
+    interface LoadALotOfDataCallback<T extends Entity> {
+        void onDataLoaded(@NonNull List<T> data);
+    }
+
+    interface SaveDataCallback<T extends Entity> {
+        void onDataSaved(@NonNull T data);
+    }
+
+    interface SaveALotOfDataCallback<T extends Entity> {
+        void onDataSaved(@NonNull List<T> data);
+    }
+
+    interface DeleteDataCallback<T extends Entity> {
+        void onDataDeleted(@NonNull T data);
+    }
+    
+    interface DeleteALotOfDataCallback<T extends Entity> {
+        void onDataDelete(@NonNull List<T> data);
+    }
+
     interface OperationFailedCallback {
-        // Return true if you want to do rollback
-        boolean onOperationFailed();
+        void onFailed();
     }
 
     /**
      * DASHBOARD
      * ----------------------------------------------------------------------------- */
 
-    interface LoadDashboardCallback {
-        void onDashboardLoaded(@NonNull Dashboard dashboard);
-        void onDataNotFound();
-    }
+    void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
+    void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback);
 
-    interface LoadDashboardsCallback {
-        void onDashboardsLoaded(@NonNull List<Dashboard> dashboards);
-        void onDataNotFound();
-    }
+    void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
+    void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback);
+    
+    void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
+    void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback);
 
-    void loadDashboard(long id, @NonNull LoadDashboardCallback callback);
-    void loadAllDashboards(@NonNull LoadDashboardsCallback callback);
-    void saveDashboard(@NonNull Dashboard dashboard, @Nullable OperationFailedCallback callback);
-    void saveDashboards(@NonNull Collection<Dashboard> dashboards, @Nullable OperationFailedCallback callback);
-    void deleteDashboard(@NonNull Dashboard dashboard, @Nullable OperationFailedCallback callback);
-    void deleteDashboards(@NonNull Collection<Dashboard> dashboards, @Nullable OperationFailedCallback callback);
-    void deleteAllDashboards(@Nullable OperationFailedCallback callback);
+    void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
+    void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback);
+    // revertIfError == true
+    void saveDashboards(@NonNull List<Dashboard> dashboards, SaveALotOfDataCallback<Dashboard> saveCallback);
+
+    void deleteDashboard(@NonNull Dashboard dashboard, DeleteDataCallback<Dashboard> deleteDataCallback, OperationFailedCallback failedCallback);
+    void deleteDashboard(@NonNull Dashboard dashboard, OperationFailedCallback failedCallback);
+
+    void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, DeleteALotOfDataCallback<Dashboard> deleteCallback, OperationFailedCallback failedCallback);
+    void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, OperationFailedCallback failedCallback);
+    // revertIfError == true
+    void deleteDashboards(@NonNull List<Dashboard> dashboards, OperationFailedCallback failedCallback);
 }

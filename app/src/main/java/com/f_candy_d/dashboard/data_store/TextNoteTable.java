@@ -1,8 +1,8 @@
 package com.f_candy_d.dashboard.data_store;
 
-import com.f_candy_d.dashboard.data.source.local.sqlite_utils.SqliteBaseTable;
-import com.f_candy_d.dashboard.data.source.local.sqlite_utils.SqliteColumnDataType;
-import com.f_candy_d.dashboard.data.source.local.sqlite_utils.SqliteTableUtils;
+import com.f_candy_d.infra.sqlite.SqliteBaseTable;
+import com.f_candy_d.infra.sqlite.SqliteColumnDataType;
+import com.f_candy_d.infra.sqlite.SqliteTableUtils;
 
 /**
  * Created by daichi on 9/30/17.

@@ -31,14 +31,15 @@ public class DashboardLoader extends SqliteEntityLoader<Dashboard> {
         SqlQuery query = new SqlQuery();
         query.setSelection(where);
         query.putTables(DashboardTable.TABLE_NAME);
-        SqlEntity[] results = Repository.getSqlite().select(query);
+//        SqlEntity[] results = Repository.getSqlite().select(query)
 
-        Dashboard[] dashboards = new Dashboard[results.length];
-        for (int i = 0; i < results.length; ++i) {
-            results[i].setTableName(DashboardTable.TABLE_NAME);
-            dashboards[i] = new Dashboard(results[i]);
-        }
+//        Dashboard[] dashboards = new Dashboard[results.length];
+//        for (int i = 0; i < results.length; ++i) {
+//            results[i].setTableName(DashboardTable.TABLE_NAME);
+//            dashboards[i] = new Dashboard(results[i]);
+//        }
 
-        return dashboards;
+//        return dashboards;
+        return null;
     }
 }

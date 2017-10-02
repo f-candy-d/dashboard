@@ -1,5 +1,6 @@
 package com.f_candy_d.dashboard.presentation.adapter;
 
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.f_candy_d.dashboard.R;
-import com.f_candy_d.dashboard.domain.structure.Dashboard;
-import com.f_candy_d.dashboard.domain.loader.DashboardLoader;
-import com.f_candy_d.infra.sqlite.SqliteEntityLoader;
+import com.f_candy_d.dashboard.data.model.Dashboard;
+
+import java.util.List;
 
 /**
  * Created by daichi on 9/30/17.
@@ -18,31 +19,48 @@ import com.f_candy_d.infra.sqlite.SqliteEntityLoader;
 
 public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.ViewHolder> {
 
-    private DashboardLoader mLoader;
+    private SortedList<Dashboard> mDashboards;
 
-    public DashboardAdapter(DashboardLoader loader) {
-        mLoader = loader;
-        mLoader.setCallback(new SqliteEntityLoader.Callback() {
-            @Override
-            public void onChanged(int index, int count) {
-                notifyItemRangeChanged(index, count);
-            }
+    public DashboardAdapter(List<Dashboard> dashboards) {
+        mDashboards = new SortedList<>(Dashboard.class,
+                new SortedList.Callback<Dashboard>() {
+                    @Override
+                    public int compare(Dashboard o1, Dashboard o2) {
+                        return 0;
+                    }
 
-            @Override
-            public void onLoaded(int index, int count) {
-                notifyItemRangeInserted(index, count);
-            }
+                    @Override
+                    public void onChanged(int position, int count) {
+                        notifyItemRangeChanged(position, count);
+                    }
 
-            @Override
-            public void onRelease(int index, int count) {
-                notifyItemRangeRemoved(index, count);
-            }
+                    @Override
+                    public boolean areContentsTheSame(Dashboard oldItem, Dashboard newItem) {
+                        return newItem.equals(oldItem);
+                    }
 
-            @Override
-            public void onMove(int fromIndex, int toIndex) {
-                notifyItemMoved(fromIndex, toIndex);
-            }
-        });
+                    @Override
+                    public boolean areItemsTheSame(Dashboard item1, Dashboard item2) {
+                        return item1.getId() == item2.getId();
+                    }
+
+                    @Override
+                    public void onInserted(int position, int count) {
+                        notifyItemRangeInserted(position, count);
+                    }
+
+                    @Override
+                    public void onRemoved(int position, int count) {
+                        notifyItemRangeRemoved(position, count);
+                    }
+
+                    @Override
+                    public void onMoved(int fromPosition, int toPosition) {
+                        notifyItemMoved(fromPosition, toPosition);
+                    }
+                });
+
+        mDashboards.addAll(dashboards);
     }
 
     @Override
@@ -54,14 +72,18 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Dashboard dashboard = mLoader.get(position);
+        Dashboard dashboard = mDashboards.get(position);
         holder.background.setCardBackgroundColor(dashboard.getThemeColor());
         holder.title.setText(dashboard.getTitle());
     }
 
     @Override
     public int getItemCount() {
-        return mLoader.getLoadedItemCount();
+        return mDashboards.size();
+    }
+
+    public Dashboard getAt(int position) {
+        return mDashboards.get(position);
     }
 
     /**

@@ -2,7 +2,9 @@ package com.f_candy_d.dashboard.domain;
 
 import android.support.annotation.NonNull;
 
-import com.f_candy_d.dashboard.domain.structure.Dashboard;
+import com.f_candy_d.dashboard.data.model.Dashboard;
+import com.f_candy_d.dashboard.data.source.DataSource;
+import com.f_candy_d.dashboard.data.source.Repository;
 
 /**
  * Created by daichi on 9/30/17.
@@ -10,49 +12,66 @@ import com.f_candy_d.dashboard.domain.structure.Dashboard;
 
 public class DashboardEditor {
 
-    private Dashboard mDashboard;
+    private Dashboard.Builder mDashboardBuilder;
     @NonNull private SaveResultListener mSaveResultListener;
 
     public DashboardEditor(@NonNull SaveResultListener resultListener) {
         mSaveResultListener = resultListener;
-        mDashboard = new Dashboard();
+        mDashboardBuilder = new Dashboard.Builder();
     }
 
     public DashboardEditor(@NonNull SaveResultListener resultListener, long id) {
         mSaveResultListener = resultListener;
-        mDashboard = Dashboard.createIfPossible(id);
-        if (mDashboard == null) {
-            mDashboard = new Dashboard();
-        }
+        Repository.getInstance().loadDashboard(id,
+                new DataSource.LoadDataCallback<Dashboard>() {
+                    @Override
+                    public void onDataLoaded(@NonNull Dashboard data) {
+                        mDashboardBuilder = new Dashboard.Builder(data);
+                    }
+                },
+                new DataSource.OperationFailedCallback() {
+                    @Override
+                    public void onFailed() {
+                        mDashboardBuilder = new Dashboard.Builder();
+                    }
+                });
     }
 
     public void onInputTitle(String title) {
         if (title != null && title.length() == 0) {
-            mDashboard.setTitle(null);
+            mDashboardBuilder.title(null);
         } else {
-            mDashboard.setTitle(title);
+            mDashboardBuilder.title(title);
         }
     }
 
     public String getTitle() {
-        return mDashboard.getTitle();
+        return mDashboardBuilder.create().getTitle();
     }
 
     public void onInputThemeColor(int color) {
-        mDashboard.setThemeColor(color);
+        mDashboardBuilder.themeColor(color);
     }
 
     public int getThemeColor() {
-        return mDashboard.getThemeColor();
+        return mDashboardBuilder.create().getThemeColor();
     }
 
     public void onSave() {
-        if (!mDashboard.isDefaultState()) {
-            if (mDashboard.commit()) {
-                mSaveResultListener.onSaveSuccessful();
-            } else {
-                mSaveResultListener.onSaveFailed();
-            }
+        if (!mDashboardBuilder.create().equals(Dashboard.createAsDefault())) {
+            Repository.getInstance().saveDashboard(mDashboardBuilder.create(),
+                    new DataSource.SaveDataCallback<Dashboard>() {
+                        @Override
+                        public void onDataSaved(@NonNull Dashboard data) {
+                            mSaveResultListener.onSaveSuccessful();
+                        }
+                    },
+                    new DataSource.OperationFailedCallback() {
+                        @Override
+                        public void onFailed() {
+                            mSaveResultListener.onSaveFailed();
+                        }
+                    });
         }
     }
 

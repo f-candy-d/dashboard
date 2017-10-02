@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.f_candy_d.dashboard.data.source.local.sqlite_utils.SqliteTableUtils;
+import com.f_candy_d.infra.sqlite.SqliteTableUtils;
 
 /**
  * Created by daichi on 17/08/30.
