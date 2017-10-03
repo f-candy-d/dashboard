@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.f_candy_d.infra.sqlite.SqliteTableUtils;
+import com.f_candy_d.sqliteutils.TableUtils;
 
 /**
  * Created by daichi on 10/2/17.
@@ -21,11 +21,11 @@ class SqliteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        SqliteTableUtils.createTable(sqLiteDatabase, DashboardTable.getTableSource());
+        TableUtils.createTable(sqLiteDatabase, DashboardTable.getTableSource());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        SqliteTableUtils.resetTable(sqLiteDatabase, DashboardTable.getTableSource());
+        TableUtils.resetTable(sqLiteDatabase, DashboardTable.getTableSource());
     }
 }

@@ -1,1 +1,1 @@
-include ':app', ':infra', ':colorpicker', ':sqliteutils'
+include ':app', ':colorpicker', ':sqliteutils'

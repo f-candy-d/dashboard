@@ -34,7 +34,6 @@ dependencies {
     compile 'com.android.support:support-v4:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.guava:guava:23.0-android'
-    compile project(':infra')
     compile project(':colorpicker')
     compile project(':sqliteutils')
     testCompile 'junit:junit:4.12'

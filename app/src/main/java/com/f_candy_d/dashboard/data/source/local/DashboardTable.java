@@ -1,14 +1,14 @@
 package com.f_candy_d.dashboard.data.source.local;
 
-import com.f_candy_d.infra.sqlite.SqliteBaseTable;
-import com.f_candy_d.infra.sqlite.SqliteColumnDataType;
-import com.f_candy_d.infra.sqlite.SqliteTableUtils;
+import com.f_candy_d.sqliteutils.BaseTable;
+import com.f_candy_d.sqliteutils.ColumnDataType;
+import com.f_candy_d.sqliteutils.TableUtils;
 
 /**
  * Created by daichi on 10/1/17.
  */
 
-public final class DashboardTable extends SqliteBaseTable {
+public final class DashboardTable extends BaseTable {
 
     private DashboardTable() {}
 
@@ -26,10 +26,10 @@ public final class DashboardTable extends SqliteBaseTable {
      * TABLE DEFINITION
      * ----------------------------------------------------------------------------- */
 
-    static SqliteTableUtils.TableSource getTableSource() {
+    static TableUtils.TableSource getTableSource() {
         return getBaseTableSource(TABLE_NAME)
-                .put(_TITLE, SqliteColumnDataType.TEXT)
-                .put(_IS_ARCHIVED, SqliteColumnDataType.INTEGER)
-                .put(_THEME_COLOR, SqliteColumnDataType.INTEGER);
+                .put(_TITLE, ColumnDataType.TEXT)
+                .put(_IS_ARCHIVED, ColumnDataType.INTEGER)
+                .put(_THEME_COLOR, ColumnDataType.INTEGER);
     }
 }
