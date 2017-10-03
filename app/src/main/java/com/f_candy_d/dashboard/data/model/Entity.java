@@ -1,5 +1,7 @@
 package com.f_candy_d.dashboard.data.model;
 
+import android.support.annotation.NonNull;
+
 import com.f_candy_d.dashboard.data.source.DataSource;
 
 /**
@@ -33,4 +35,25 @@ abstract public class Entity {
 
     @Override
     abstract public boolean equals(Object obj);
+
+    /**
+     * EDITOR
+     * ----------------------------------------------------------------------------- */
+
+    abstract static class BaseEditor<T extends Entity, T2 extends BaseEditor<T, T2>> {
+
+        public BaseEditor() {
+            initializeAsDefault();
+        }
+
+        public BaseEditor(@NonNull T source) {
+            importSource(source);
+        }
+
+        abstract public T2 id(long id);
+        abstract public long id();
+        abstract public T2 importSource(@NonNull T source);
+        abstract public void initializeAsDefault();
+        abstract public T export();
+    }
 }

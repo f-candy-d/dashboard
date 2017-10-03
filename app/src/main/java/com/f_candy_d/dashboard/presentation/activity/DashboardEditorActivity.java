@@ -220,7 +220,7 @@ public class DashboardEditorActivity extends AppCompatActivity
     }
 
     /**
-     * DashboardEditor.SaveResultListener implementation
+     * BaseEditor.SaveResultListener implementation
      * ----------------------------------------------------------------------------- */
 
     @Override

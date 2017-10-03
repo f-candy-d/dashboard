@@ -101,31 +101,41 @@ public class Dashboard extends Entity {
      * BUILDER
      * ----------------------------------------------------------------------------- */
 
-    public static class Editor {
+    public static class Editor extends BaseEditor<Dashboard, Editor> {
 
         private Dashboard mDashboard;
 
         public Editor() {
-            initializeAsDefault();
+            super();
         }
 
         public Editor(@NonNull Dashboard source) {
-            importSource(source);
+            super(source);
         }
 
-        public void importSource(@NonNull Dashboard source) {
+        @Override
+        public Editor importSource(@NonNull Dashboard source) {
             mDashboard = new Dashboard(Preconditions.checkNotNull(source));
+            return this;
         }
 
+        @Override
         public void initializeAsDefault() {
             importSource(Dashboard.createAsDefault());
         }
 
+        @Override
+        public Dashboard export() {
+            return new Dashboard(mDashboard);
+        }
+
+        @Override
         public Editor id(long id) {
             mDashboard.setId(id);
             return this;
         }
 
+        @Override
         public long id() {
             return mDashboard.getId();
         }
@@ -155,10 +165,6 @@ public class Dashboard extends Entity {
 
         public int themeColor() {
             return mDashboard.getThemeColor();
-        }
-
-        public Dashboard export() {
-            return new Dashboard(mDashboard);
         }
     }
 }
