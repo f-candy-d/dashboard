@@ -145,7 +145,7 @@ public class EditTextDialog extends DialogFragment {
     }
 
     /**
-     * Builder
+     * Editor
      * --------------------------------------------------------------------------- */
 
     public static class Builder {

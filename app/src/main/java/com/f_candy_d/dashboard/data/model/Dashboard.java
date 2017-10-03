@@ -1,6 +1,9 @@
 package com.f_candy_d.dashboard.data.model;
 
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+
+import com.google.common.base.Preconditions;
 
 /**
  * Created by daichi on 10/1/17.
@@ -13,9 +16,9 @@ public class Dashboard extends Entity {
     // @color/task_theme_color_indigo
     public static final int DEFAULT_THEME_COLOR = Color.parseColor("#3F51B5");
 
-    private final String mTitle;
-    private final boolean mIsArchived;
-    private final int mThemeColor;
+    private String mTitle;
+    private boolean mIsArchived;
+    private int mThemeColor;
 
     public static Dashboard createAsDefault() {
         return new Dashboard(
@@ -30,6 +33,13 @@ public class Dashboard extends Entity {
         mTitle = title;
         mIsArchived = isArchived;
         mThemeColor = themeColor;
+    }
+
+    private Dashboard(@NonNull Dashboard source) {
+        super(source.getId());
+        mTitle = source.getTitle();
+        mIsArchived = source.isArchived();
+        mThemeColor = source.getThemeColor();
     }
 
     @Override
@@ -72,60 +82,83 @@ public class Dashboard extends Entity {
     }
 
     /**
+     * SETTER (THESE METHODS CAN BE USED FROM EDITOR CLASS)
+     * ----------------------------------------------------------------------------- */
+
+    private void setTitle(String title) {
+        mTitle = title;
+    }
+
+    private void setArchived(boolean archived) {
+        mIsArchived = archived;
+    }
+
+    private void setThemeColor(int themeColor) {
+        mThemeColor = themeColor;
+    }
+
+    /**
      * BUILDER
      * ----------------------------------------------------------------------------- */
 
-    public static class Builder {
+    public static class Editor {
 
-        private long mId;
-        private String mTitle;
-        private boolean mIsArchived;
-        private int mThemeColor;
+        private Dashboard mDashboard;
 
-        public Builder() {
-            reset();
+        public Editor() {
+            initializeAsDefault();
         }
 
-        public Builder(Dashboard source) {
-            if (source != null) {
-                mId = source.getId();
-                mTitle = source.getTitle();
-                mIsArchived = source.isArchived();
-                mThemeColor = source.getThemeColor();
-            } else {
-                reset();
-            }
+        public Editor(@NonNull Dashboard source) {
+            importSource(source);
         }
 
-        public void reset() {
-            mId = DEFAULT_ID;
-            mTitle = DEFAULT_TITLE;
-            mIsArchived = DEFAULT_IS_ARCHIVED;
-            mThemeColor = DEFAULT_THEME_COLOR;
+        public void importSource(@NonNull Dashboard source) {
+            mDashboard = new Dashboard(Preconditions.checkNotNull(source));
         }
 
-        public Builder id(long id) {
-            mId = id;
+        public void initializeAsDefault() {
+            importSource(Dashboard.createAsDefault());
+        }
+
+        public Editor id(long id) {
+            mDashboard.setId(id);
             return this;
         }
 
-        public Builder title(String title) {
-            mTitle = title;
+        public long id() {
+            return mDashboard.getId();
+        }
+
+        public Editor title(String title) {
+            mDashboard.setTitle(title);
             return this;
         }
 
-        public Builder isArchived(boolean isArchived) {
-            mIsArchived = isArchived;
+        public String title() {
+            return mDashboard.getTitle();
+        }
+
+        public Editor isArchived(boolean isArchived) {
+            mDashboard.setArchived(isArchived);
             return this;
         }
 
-        public Builder themeColor(int themeColor) {
-            mThemeColor = themeColor;
+        public boolean isArchived() {
+            return mDashboard.isArchived();
+        }
+
+        public Editor themeColor(int themeColor) {
+            mDashboard.setThemeColor(themeColor);
             return this;
         }
 
-        public Dashboard create() {
-            return new Dashboard(mId, mTitle, mIsArchived, mThemeColor);
+        public int themeColor() {
+            return mDashboard.getThemeColor();
+        }
+
+        public Dashboard export() {
+            return new Dashboard(mDashboard);
         }
     }
 }

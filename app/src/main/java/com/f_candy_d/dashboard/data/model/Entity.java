@@ -10,10 +10,7 @@ abstract public class Entity {
 
     public static long DEFAULT_ID = DataSource.INVALID_ID;
 
-    /**
-     * This variable has package-private visibility.
-     */
-    private final long mId;
+    private long mId;
 
     public Entity(long id) {
         mId = id;
@@ -25,6 +22,10 @@ abstract public class Entity {
 
     public long getId() {
         return mId;
+    }
+
+    protected void setId(long id) {
+        mId = id;
     }
 
     @Override

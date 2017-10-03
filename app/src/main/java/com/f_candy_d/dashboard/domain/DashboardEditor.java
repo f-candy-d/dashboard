@@ -12,12 +12,12 @@ import com.f_candy_d.dashboard.data.source.Repository;
 
 public class DashboardEditor {
 
-    private Dashboard.Builder mDashboardBuilder;
+    private Dashboard.Editor mDashboardEditor;
     @NonNull private SaveResultListener mSaveResultListener;
 
     public DashboardEditor(@NonNull SaveResultListener resultListener) {
         mSaveResultListener = resultListener;
-        mDashboardBuilder = new Dashboard.Builder();
+        mDashboardEditor = new Dashboard.Editor();
     }
 
     public DashboardEditor(@NonNull SaveResultListener resultListener, long id) {
@@ -26,40 +26,40 @@ public class DashboardEditor {
                 new DataSource.LoadDataCallback<Dashboard>() {
                     @Override
                     public void onDataLoaded(@NonNull Dashboard data) {
-                        mDashboardBuilder = new Dashboard.Builder(data);
+                        mDashboardEditor = new Dashboard.Editor(data);
                     }
                 },
                 new DataSource.OperationFailedCallback() {
                     @Override
                     public void onFailed() {
-                        mDashboardBuilder = new Dashboard.Builder();
+                        mDashboardEditor = new Dashboard.Editor();
                     }
                 });
     }
 
     public void onInputTitle(String title) {
         if (title != null && title.length() == 0) {
-            mDashboardBuilder.title(null);
+            mDashboardEditor.title(null);
         } else {
-            mDashboardBuilder.title(title);
+            mDashboardEditor.title(title);
         }
     }
 
     public String getTitle() {
-        return mDashboardBuilder.create().getTitle();
+        return mDashboardEditor.title();
     }
 
     public void onInputThemeColor(int color) {
-        mDashboardBuilder.themeColor(color);
+        mDashboardEditor.themeColor(color);
     }
 
     public int getThemeColor() {
-        return mDashboardBuilder.create().getThemeColor();
+        return mDashboardEditor.themeColor();
     }
 
     public void onSave() {
-        if (!mDashboardBuilder.create().equals(Dashboard.createAsDefault())) {
-            Repository.getInstance().saveDashboard(mDashboardBuilder.create(),
+        if (!mDashboardEditor.export().equals(Dashboard.createAsDefault())) {
+            Repository.getInstance().saveDashboard(mDashboardEditor.export(),
                     new DataSource.SaveDataCallback<Dashboard>() {
                         @Override
                         public void onDataSaved(@NonNull Dashboard data) {
