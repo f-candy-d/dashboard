@@ -8,7 +8,7 @@ import com.f_candy_d.dashboard.data.source.DataSource;
  * Created by daichi on 10/1/17.
  */
 
-abstract public class Entity {
+abstract public class Entity<T extends Entity<T>> {
 
     public static long DEFAULT_ID = DataSource.INVALID_ID;
 
@@ -26,7 +26,10 @@ abstract public class Entity {
         return mId;
     }
 
-    protected void setId(long id) {
+    /**
+     * This should be used only by BaseModifier class
+     */
+    void setId(long id) {
         mId = id;
     }
 
@@ -37,23 +40,47 @@ abstract public class Entity {
     abstract public boolean equals(Object obj);
 
     /**
+     * Override this method in a Child class.
+     * Do not forget to call super.initialize(T).
+     */
+    public void initialize(@NonNull T source) {
+        mId = source.getId();
+    }
+
+    /**
      * EDITOR
      * ----------------------------------------------------------------------------- */
 
-    abstract static class BaseEditor<T extends Entity, T2 extends BaseEditor<T, T2>> {
+    abstract static class BaseModifier<T extends Entity<T>, T2 extends BaseModifier<T, T2>> {
 
-        public BaseEditor() {
-            initializeAsDefault();
+        private T mTarget = null;
+
+        public BaseModifier() {}
+
+        public BaseModifier(@NonNull T target) {
+            setTarget(target);
         }
 
-        public BaseEditor(@NonNull T source) {
-            importSource(source);
+        T getTarget() {
+            return mTarget;
         }
 
-        abstract public T2 id(long id);
-        abstract public long id();
-        abstract public T2 importSource(@NonNull T source);
-        abstract public void initializeAsDefault();
-        abstract public T export();
+        @SuppressWarnings("unchecked")
+        public T2 setTarget(@NonNull T target) {
+            mTarget = target;
+            return (T2) this;
+        }
+
+        public T releaseTarget() {
+            T target = mTarget;
+            mTarget = null;
+            return target;
+        }
+
+        @SuppressWarnings("unchecked")
+        public T2 id(long id) {
+            mTarget.setId(id);
+            return (T2) this;
+        }
     }
 }

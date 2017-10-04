@@ -47,24 +47,22 @@ public interface DataSource {
      * DASHBOARD
      * ----------------------------------------------------------------------------- */
 
+    // General methods
     void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
-    void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback);
-
     void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
-    void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback);
-    
     void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
-    void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback);
-
     void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
+    void deleteDashboard(@NonNull Dashboard dashboard, DeleteDataCallback<Dashboard> deleteDataCallback, OperationFailedCallback failedCallback);
+    void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, DeleteALotOfDataCallback<Dashboard> deleteCallback, OperationFailedCallback failedCallback);
+
+    // Convenience methods
+    void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback);
+    void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback);
+    void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback);
     void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback);
     // revertIfError == true
     void saveDashboards(@NonNull List<Dashboard> dashboards, SaveALotOfDataCallback<Dashboard> saveCallback);
-
-    void deleteDashboard(@NonNull Dashboard dashboard, DeleteDataCallback<Dashboard> deleteDataCallback, OperationFailedCallback failedCallback);
     void deleteDashboard(@NonNull Dashboard dashboard, OperationFailedCallback failedCallback);
-
-    void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, DeleteALotOfDataCallback<Dashboard> deleteCallback, OperationFailedCallback failedCallback);
     void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, OperationFailedCallback failedCallback);
     // revertIfError == true
     void deleteDashboards(@NonNull List<Dashboard> dashboards, OperationFailedCallback failedCallback);

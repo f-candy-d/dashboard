@@ -86,7 +86,7 @@ public class SqliteDataSource implements DataSource {
             long id = DashboardCrud.create(db, dashboard);
             db.close();
             if (id != INVALID_ID && saveCallback != null) {
-                saveCallback.onDataSaved(new Dashboard.Editor(dashboard).id(id).export());
+                saveCallback.onDataSaved(new Dashboard.Modifier(dashboard).id(id).releaseTarget());
             }
             if (id == INVALID_ID && failedCallback != null) {
                 failedCallback.onFailed();
@@ -116,7 +116,7 @@ public class SqliteDataSource implements DataSource {
                     // Insert
                     long id = DashboardCrud.create(db, dashboard);
                     if (id != INVALID_ID) {
-                        saved.add(new Dashboard.Editor(dashboard).id(id).export());
+                        saved.add(new Dashboard.Modifier(dashboard).id(id).releaseTarget());
                     } else {
                         isError = true;
                         break;

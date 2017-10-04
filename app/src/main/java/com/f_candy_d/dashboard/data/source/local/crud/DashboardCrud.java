@@ -34,20 +34,20 @@ public final class DashboardCrud {
     public static List<Dashboard> read(SQLiteDatabase db, QueryBuilder queryBuilder) {
         Cursor cursor = queryBuilder.query(db);
         ContentValues valueMap = new ContentValues();
-        Dashboard.Editor editor = new Dashboard.Editor();
+        Dashboard.Modifier modifier = new Dashboard.Modifier();
         ArrayList<Dashboard> dashboards = new ArrayList<>(cursor.getCount());
         boolean hasNext = cursor.moveToFirst();
 
         while (hasNext) {
             valueMap.clear();
-            editor.initializeAsDefault();
+            modifier.setTarget(Dashboard.createAsDefault());
             DatabaseUtils.cursorRowToContentValues(cursor, valueMap);
-            dashboards.add(editor
+            dashboards.add(modifier
                     .id(valueMap.getAsLong(DashboardTable._ID))
                     .title(valueMap.getAsString(DashboardTable._TITLE))
                     .themeColor(valueMap.getAsInteger(DashboardTable._THEME_COLOR))
                     .isArchived(DataConverter.toJavaBool(valueMap.getAsInteger(DashboardTable._IS_ARCHIVED)))
-                    .export());
+                    .releaseTarget());
             hasNext = cursor.moveToNext();
         }
 
