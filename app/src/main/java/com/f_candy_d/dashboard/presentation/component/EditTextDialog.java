@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.presentation.dialog;
+package com.f_candy_d.dashboard.presentation.component;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

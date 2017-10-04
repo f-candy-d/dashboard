@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.presentation.adapter;
+package com.f_candy_d.dashboard.presentation.component;
 
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.CardView;
@@ -21,7 +21,7 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
 
     private SortedList<Dashboard> mDashboards;
 
-    public DashboardAdapter(List<Dashboard> dashboards) {
+    public DashboardAdapter() {
         mDashboards = new SortedList<>(Dashboard.class,
                 new SortedList.Callback<Dashboard>() {
                     @Override
@@ -59,8 +59,6 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
                         notifyItemMoved(fromPosition, toPosition);
                     }
                 });
-
-        mDashboards.addAll(dashboards);
     }
 
     @Override
@@ -84,6 +82,25 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
 
     public Dashboard getAt(int position) {
         return mDashboards.get(position);
+    }
+
+    public void addDashboards(List<Dashboard> dashboards) {
+        mDashboards.addAll(dashboards);
+    }
+
+    public void addDashboard(Dashboard dashboard) {
+        mDashboards.add(dashboard);
+    }
+
+    public void removeDashboard(Dashboard dashboard) {
+        mDashboards.remove(dashboard);
+    }
+
+    public void replaceDashboards(List<Dashboard> newDashboards) {
+        mDashboards.beginBatchedUpdates();
+        mDashboards.clear();
+        mDashboards.addAll(newDashboards);
+        mDashboards.endBatchedUpdates();
     }
 
     /**

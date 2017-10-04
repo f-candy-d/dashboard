@@ -1,5 +1,6 @@
-package com.f_candy_d.dashboard.presentation.activity;
+package com.f_candy_d.dashboard.presentation.view;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,13 +19,13 @@ import android.widget.Toast;
 import com.android.colorpicker.ColorPickerDialog;
 import com.android.colorpicker.ColorPickerSwatch;
 import com.f_candy_d.dashboard.R;
-import com.f_candy_d.dashboard.data.source.Repository;
-import com.f_candy_d.dashboard.domain.DashboardEditor;
-import com.f_candy_d.dashboard.presentation.dialog.EditTextDialog;
-import com.f_candy_d.dashboard.utils.ColorUtils;
+import com.f_candy_d.dashboard.presentation.component.EditTextDialog;
+import com.f_candy_d.dashboard.presentation.contract.EditDashboardContract;
+import com.f_candy_d.dashboard.presentation.presenter.EditDashboardPresenter;
+import com.f_candy_d.dashboard.presentation.utils.ColorUtils;
 
 public class DashboardEditorActivity extends AppCompatActivity
-        implements DashboardEditor.SaveResultListener {
+        implements EditDashboardContract.View {
 
     private static final String FRAGMENT_TAG_EDIT_TEXT_DIALOG = "edit_text_dialog";
     private static final String FRAGMENT_TAG_COLOR_PICKER_DIALOG = "color_picker_dialog";
@@ -32,49 +33,31 @@ public class DashboardEditorActivity extends AppCompatActivity
     /**
      * For Extras
      */
-    private static final String KEY_START_WITH_EDIT_TITLE_DIALOG = "start_with_edit_title_dialog";
-    private static final String KEY_DASHBOARD_ID = "dashboard_id";
+    public static final String KEY_TARGET_DASHBOARD_ID = "target_dashboard_id";
+    public static final String KEY_START_WITH_EDIT_TITLE_DIALOG = "start_with_edit_title_dialog";
 
-    private DashboardEditor mDashboardEditor;
     private boolean mIsActivityOnFirstRun;
-
-    public static Bundle makeExtras(boolean startWithEditTitleDialog) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(KEY_START_WITH_EDIT_TITLE_DIALOG, startWithEditTitleDialog);
-        return bundle;
-    }
-
-    public static Bundle makeExtras(long dashboardId, boolean startWithEditTitleDialog) {
-        Bundle bundle = new Bundle();
-        bundle.putLong(KEY_DASHBOARD_ID, dashboardId);
-        bundle.putBoolean(KEY_START_WITH_EDIT_TITLE_DIALOG, startWithEditTitleDialog);
-        return bundle;
-    }
+    private EditDashboardPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard_editor);
-
         // Initialization
         mIsActivityOnFirstRun = (savedInstanceState == null);
-        long id = getIntent().getLongExtra(KEY_DASHBOARD_ID, Repository.INVALID_ID);
-        if (id != Repository.INVALID_ID) {
-            mDashboardEditor = new DashboardEditor(this, id);
+        if (getIntent().getExtras() != null && getIntent().hasExtra(KEY_TARGET_DASHBOARD_ID)) {
+            mPresenter = new EditDashboardPresenter(getIntent().getExtras().getLong(KEY_TARGET_DASHBOARD_ID));
         } else {
-            mDashboardEditor = new DashboardEditor(this);
+            mPresenter = new EditDashboardPresenter();
         }
-
         onCreateUI(savedInstanceState);
+        mIsUiAvailable = true;
+        mPresenter.onStart(this);
     }
 
     private void onCreateUI(Bundle savedInstanceState) {
 
         // # Toolbar & ToolbarLayout
-
-        final CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-        toolbarLayout.setTitle(mDashboardEditor.getTitle());
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -108,18 +91,13 @@ public class DashboardEditorActivity extends AppCompatActivity
                 colorPickerDialog.setOnColorSelectedListener(COLOR_SELECTED_LISTENER);
             }
         }
-
-        // # Theme Color
-
-        invalidateThemeColor(mDashboardEditor.getThemeColor());
     }
 
     private final EditTextDialog.ButtonClickListener EDIT_TEXT_DIALOG_BUTTON_CLICK_LISTENER =
             new EditTextDialog.ButtonClickListener() {
                 @Override
                 public void onPositiveButtonClick(int tag, String text) {
-                    mDashboardEditor.onInputTitle(text);
-                    ((CollapsingToolbarLayout) findViewById(R.id.toolbar_layout)).setTitle(text);
+                    mPresenter.onInputDashboardTitle(text);
                 }
 
                 @Override
@@ -138,22 +116,11 @@ public class DashboardEditorActivity extends AppCompatActivity
                 .show(getSupportFragmentManager(), FRAGMENT_TAG_EDIT_TEXT_DIALOG);
     }
 
-    private void invalidateThemeColor(int color) {
-        findViewById(R.id.root_view).setBackgroundColor(color);
-        findViewById(R.id.app_bar).setBackgroundColor(color);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ColorUtils.manipulateBrightness(color, 0.7f));
-        }
-    }
-
     private final ColorPickerSwatch.OnColorSelectedListener COLOR_SELECTED_LISTENER
             = new ColorPickerSwatch.OnColorSelectedListener() {
         @Override
         public void onColorSelected(int color) {
-            mDashboardEditor.onInputThemeColor(color);
-            invalidateThemeColor(color);
+            mPresenter.onInputDashboardThemeColor(color);
         }
     };
 
@@ -184,7 +151,7 @@ public class DashboardEditorActivity extends AppCompatActivity
 
         boolean startWithEditTitleDialog = getIntent().getBooleanExtra(KEY_START_WITH_EDIT_TITLE_DIALOG, false);
         if (mIsActivityOnFirstRun && startWithEditTitleDialog) {
-            showEditTitleDialog(mDashboardEditor.getTitle(), "SKIP");
+            showEditTitleDialog(mPresenter.getDashboardTitle(), "SKIP");
             mIsActivityOnFirstRun = false;
         }
     }
@@ -197,8 +164,7 @@ public class DashboardEditorActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        mDashboardEditor.onSave();
-        super.onBackPressed();
+        mPresenter.onSave();
     }
 
     @Override
@@ -211,25 +177,67 @@ public class DashboardEditorActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_edit_title) {
-            showEditTitleDialog(mDashboardEditor.getTitle(), "CANCEL");
+            showEditTitleDialog(mPresenter.getDashboardTitle(), "CANCEL");
         } else if (id == R.id.action_select_theme_color) {
-            showColorPickerDialog(mDashboardEditor.getThemeColor());
+            showColorPickerDialog(mPresenter.getDashboardThemeColor());
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * BaseEditor.SaveResultListener implementation
-     * ----------------------------------------------------------------------------- */
+    private boolean mIsUiAvailable = false;
 
     @Override
-    public void onSaveSuccessful() {
+    public boolean isAvailable() {
+        return mIsUiAvailable;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mIsUiAvailable = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsUiAvailable = false;
+    }
+
+    @Override
+    public void showDashboardTitle(String title) {
+        ((CollapsingToolbarLayout) findViewById(R.id.toolbar_layout)).setTitle(title);
+    }
+
+    @Override
+    public void showDashboardThemeColor(int themeColor) {
+        findViewById(R.id.root_view).setBackgroundColor(themeColor);
+        findViewById(R.id.app_bar).setBackgroundColor(themeColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(ColorUtils.manipulateBrightness(themeColor, 0.7f));
+        }
+    }
+
+    @Override
+    public void showSaveSuccessfullyMessage() {
         Toast.makeText(this, "Save was successful!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onSaveFailed() {
+    public void showSaveFailedMessage() {
         Toast.makeText(this, "Sorry, failed to save...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCloseUi(Bundle resultData, boolean wasSuccessful) {
+        int resultCode = (wasSuccessful) ? RESULT_OK : RESULT_CANCELED;
+        Intent intent = new Intent();
+        if (resultData != null) {
+            intent.putExtras(resultData);
+        }
+        setResult(resultCode, intent);
+        finish();
     }
 }

@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.utils;
+package com.f_candy_d.dashboard.presentation.utils;
 
 import android.graphics.Color;
 

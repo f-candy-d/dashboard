@@ -18,6 +18,8 @@ public class DashboardEditor {
 
     public DashboardEditor(@NonNull SaveResultListener resultListener) {
         mSaveResultListener = resultListener;
+        mDashboard = Dashboard.createAsDefault();
+        mDashboardModifier = new Dashboard.Modifier(mDashboard);
     }
 
     public DashboardEditor(@NonNull SaveResultListener resultListener, long id) {

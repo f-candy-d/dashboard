@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.presentation.activity;
+package com.f_candy_d.dashboard.presentation.view;
 
 import android.content.Intent;
 import android.os.Build;
@@ -12,45 +12,38 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.f_candy_d.dashboard.R;
 import com.f_candy_d.dashboard.data.model.Dashboard;
 import com.f_candy_d.dashboard.data.source.DataSource;
 import com.f_candy_d.dashboard.data.source.Repository;
-import com.f_candy_d.dashboard.presentation.ItemClickHelper;
-import com.f_candy_d.dashboard.presentation.adapter.DashboardAdapter;
+import com.f_candy_d.dashboard.presentation.contract.HomeContract;
+import com.f_candy_d.dashboard.presentation.presenter.EditDashboardPresenter;
+import com.f_candy_d.dashboard.presentation.presenter.HomePresenter;
+import com.f_candy_d.dashboard.presentation.utils.ItemClickHelper;
+import com.f_candy_d.dashboard.presentation.component.DashboardAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements HomeContract.View {
 
     private static final int SINGLE_SPAN_COUNT = 1;
     private static final int MULTIPLE_SPAN_COUNT = 2;
 
+    private HomePresenter mPresenter;
+    private boolean mIsUiAvailable = false;
     private DashboardAdapter mDashboardAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        // Initialization
-        Repository.getInstance().loadAllDashboards(
-                new DataSource.LoadALotOfDataCallback<Dashboard>() {
-                    @Override
-                    public void onDataLoaded(@NonNull List<Dashboard> data) {
-                        mDashboardAdapter = new DashboardAdapter(data);
-                    }
-                },
-                new DataSource.OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        mDashboardAdapter = new DashboardAdapter(new ArrayList<Dashboard>());
-                    }
-                });
-
         onCreateUI();
+        mPresenter = new HomePresenter();
+        mIsUiAvailable = true;
+        mPresenter.onStart(this);
     }
 
     private void onCreateUI() {
@@ -76,6 +69,11 @@ public class HomeActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(MULTIPLE_SPAN_COUNT, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(mDashboardAdapter);
 
+        // # Adapter
+
+        mDashboardAdapter = new DashboardAdapter();
+        recyclerView.setAdapter(mDashboardAdapter);
+
         // # ItemClickHelper
 
         ItemClickHelper<DashboardAdapter.ViewHolder> itemClickHelper =
@@ -83,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(DashboardAdapter.ViewHolder viewHolder) {
                 Dashboard dashboard = mDashboardAdapter.getAt(viewHolder.getAdapterPosition());
-                launchDashboardEditor(dashboard.getId());
+                mPresenter.onOpenDashboardDetails(dashboard);
             }
 
             @Override
@@ -97,20 +95,70 @@ public class HomeActivity extends AppCompatActivity {
         findViewById(R.id.add_new_board_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchDashboardEditor();
+                mPresenter.onCreateNewDashboard();
             }
         });
     }
 
-    private void launchDashboardEditor() {
+    @Override
+    public boolean isAvailable() {
+        return mIsUiAvailable;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mIsUiAvailable = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsUiAvailable = false;
+    }
+
+    @Override
+    public void appendDashboards(List<Dashboard> dashboards) {
+        mDashboardAdapter.addDashboards(dashboards);
+    }
+
+    @Override
+    public void replaceDashboards(List<Dashboard> newDashboards) {
+        mDashboardAdapter.replaceDashboards(newDashboards);
+    }
+
+    @Override
+    public void onDashboardArchived(Dashboard dashboard) {
+        mDashboardAdapter.removeDashboard(dashboard);
+    }
+
+    @Override
+    public void showArchivingDashboardError() {
+        Toast.makeText(this, "Error occurred archiving a Dashboard...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void removeDashboard(Dashboard dashboard) {
+        mDashboardAdapter.removeDashboard(dashboard);
+    }
+
+    @Override
+    public void showLoadingDashboardsError() {
+        Toast.makeText(this, "Error occurred loading dashboards...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showDashboardDetailsUi(long targetDashboardId) {
         Intent intent = new Intent(this, DashboardEditorActivity.class);
-        intent.putExtras(DashboardEditorActivity.makeExtras(true));
+        intent.putExtra(DashboardEditorActivity.KEY_TARGET_DASHBOARD_ID, targetDashboardId);
+        intent.putExtra(DashboardEditorActivity.KEY_START_WITH_EDIT_TITLE_DIALOG, false);
         startActivity(intent);
     }
 
-    private void launchDashboardEditor(long id) {
+    @Override
+    public void showCreateNewDashboardUi() {
         Intent intent = new Intent(this, DashboardEditorActivity.class);
-        intent.putExtras(DashboardEditorActivity.makeExtras(id, false));
+        intent.putExtra(DashboardEditorActivity.KEY_START_WITH_EDIT_TITLE_DIALOG, true);
         startActivity(intent);
     }
 }

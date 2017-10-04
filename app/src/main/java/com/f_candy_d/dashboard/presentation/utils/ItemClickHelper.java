@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.presentation;
+package com.f_candy_d.dashboard.presentation.utils;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
