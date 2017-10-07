@@ -34,6 +34,10 @@ public class Repository implements DataSource {
         INSTANCE = new Repository(context);
     }
 
+    public void refresh() {
+        clearDashboardCache();
+    }
+
     /**
      * CRUD FOR DASHBOARD
      * ----------------------------------------------------------------------------- */
@@ -41,22 +45,22 @@ public class Repository implements DataSource {
     private LongSparseArray<Dashboard> mDashboardCache;
 
     @Override
-    public void loadDashboard(long id, final LoadDataCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
+    public void loadDashboard(long id, final ResultCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
         Dashboard cached = mDashboardCache.get(id);
         if (mDashboardCache != null && cached != null) {
             if (loadCallback != null) {
-                loadCallback.onDataLoaded(cached);
+                loadCallback.onResult(cached);
             }
             return;
         }
 
         mLocalDataSource.loadDashboard(id, 
-                new LoadDataCallback<Dashboard>() {
+                new ResultCallback<Dashboard>() {
                     @Override
-                    public void onDataLoaded(@NonNull Dashboard data) {
+                    public void onResult(@NonNull Dashboard data) {
                         cacheDashboard(data);
                         if (loadCallback != null) {
-                            loadCallback.onDataLoaded(data);
+                            loadCallback.onResult(data);
                         }
                     }
                 },
@@ -71,19 +75,19 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback) {
+    public void loadDashboard(long id, ResultCallback<Dashboard> loadCallback) {
         loadDashboard(id, loadCallback, null);
     }
     
     @Override
-    public void loadAllDashboards(final LoadALotOfDataCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
+    public void loadAllDashboards(final ManyResultsCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.loadAllDashboards(
-                new LoadALotOfDataCallback<Dashboard>() {
+                new ManyResultsCallback<Dashboard>() {
                     @Override
-                    public void onDataLoaded(@NonNull List<Dashboard> data) {
+                    public void onManyResults(@NonNull List<Dashboard> data) {
                         cacheDashboards(data);
                         if (loadCallback != null) {
-                            loadCallback.onDataLoaded(data);
+                            loadCallback.onManyResults(data);
                         }
                     }
                 },
@@ -98,19 +102,19 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback) {
+    public void loadAllDashboards(ManyResultsCallback<Dashboard> loadCallback) {
         loadAllDashboards(loadCallback, null);
     }
 
     @Override
-    public void saveDashboard(@NonNull final Dashboard dashboard, final SaveDataCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
+    public void saveDashboard(@NonNull final Dashboard dashboard, final ResultCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.saveDashboard(checkNotNull(dashboard),
-                new SaveDataCallback<Dashboard>() {
+                new ResultCallback<Dashboard>() {
                     @Override
-                    public void onDataSaved(@NonNull Dashboard data) {
+                    public void onResult(@NonNull Dashboard data) {
                         cacheDashboard(data);
                         if (saveCallback != null) {
-                            saveCallback.onDataSaved(data);
+                            saveCallback.onResult(data);
                         }
                     }
                 },
@@ -125,19 +129,19 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback) {
+    public void saveDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> saveCallback) {
         saveDashboard(dashboard, saveCallback, null);
     }
 
     @Override
-    public void saveDashboards(@NonNull final List<Dashboard> dashboards, boolean revertIfError, final SaveALotOfDataCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
+    public void saveDashboards(@NonNull final List<Dashboard> dashboards, boolean revertIfError, final ManyResultsCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.saveDashboards(checkNotNull(dashboards), revertIfError,
-                new SaveALotOfDataCallback<Dashboard>() {
+                new ManyResultsCallback<Dashboard>() {
                     @Override
-                    public void onDataSaved(@NonNull List<Dashboard> data) {
+                    public void onManyResults(@NonNull List<Dashboard> data) {
                         releaseCachedDashboards(data);
                         if (saveCallback != null) {
-                            saveCallback.onDataSaved(data);
+                            saveCallback.onManyResults(data);
                         }
                     }
                 },
@@ -152,24 +156,24 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback) {
+    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> saveCallback) {
         saveDashboards(dashboards, revertIfError, saveCallback, null);
     }
 
     @Override
-    public void saveDashboards(@NonNull List<Dashboard> dashboards, SaveALotOfDataCallback<Dashboard> saveCallback) {
+    public void saveDashboards(@NonNull List<Dashboard> dashboards, ManyResultsCallback<Dashboard> saveCallback) {
         saveDashboards(dashboards, true, saveCallback, null);
     }
     
     @Override
-    public void deleteDashboard(@NonNull final Dashboard dashboard, final DeleteDataCallback<Dashboard> deleteDataCallback, final OperationFailedCallback failedCallback) {
+    public void deleteDashboard(@NonNull final Dashboard dashboard, final ResultCallback<Dashboard> deleteDataCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.deleteDashboard(checkNotNull(dashboard),
-                new DeleteDataCallback<Dashboard>() {
+                new ResultCallback<Dashboard>() {
                     @Override
-                    public void onDataDeleted(@NonNull Dashboard data) {
+                    public void onResult(@NonNull Dashboard data) {
                         releaseCachedDashboard(dashboard);
                         if (deleteDataCallback != null) {
-                            deleteDataCallback.onDataDeleted(data);
+                            deleteDataCallback.onResult(data);
                         }
                     }
                 },
@@ -189,14 +193,14 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, final DeleteALotOfDataCallback<Dashboard> deleteCallback, final OperationFailedCallback failedCallback) {
+    public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, final ManyResultsCallback<Dashboard> deleteCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.deleteDashboards(checkNotNull(dashboards), revertIfError,
-                new DeleteALotOfDataCallback<Dashboard>() {
+                new ManyResultsCallback<Dashboard>() {
                     @Override
-                    public void onDataDelete(@NonNull List<Dashboard> data) {
+                    public void onManyResults(@NonNull List<Dashboard> data) {
                         releaseCachedDashboards(data);
                         if (deleteCallback != null) {
-                            deleteCallback.onDataDelete(data);
+                            deleteCallback.onManyResults(data);
                         }
                     }
                 },

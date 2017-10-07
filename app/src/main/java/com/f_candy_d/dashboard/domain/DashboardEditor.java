@@ -23,22 +23,7 @@ public class DashboardEditor {
     }
 
     public DashboardEditor(@NonNull SaveResultListener resultListener, long id) {
-        mSaveResultListener = resultListener;
-        Repository.getInstance().loadDashboard(id,
-                new DataSource.LoadDataCallback<Dashboard>() {
-                    @Override
-                    public void onDataLoaded(@NonNull Dashboard data) {
-                        mDashboard = data;
-                        mDashboardModifier = new Dashboard.Modifier(mDashboard);
-                    }
-                },
-                new DataSource.OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        mDashboard = Dashboard.createAsDefault();
-                        mDashboardModifier = new Dashboard.Modifier(mDashboard);
-                    }
-                });
+
     }
 
     public void onInputTitle(String title) {
@@ -61,23 +46,6 @@ public class DashboardEditor {
         return mDashboard.getThemeColor();
     }
 
-    public void onSave() {
-        if (!mDashboard.equals(Dashboard.createAsDefault())) {
-            Repository.getInstance().saveDashboard(mDashboard,
-                    new DataSource.SaveDataCallback<Dashboard>() {
-                        @Override
-                        public void onDataSaved(@NonNull Dashboard data) {
-                            mSaveResultListener.onSaveSuccessful();
-                        }
-                    },
-                    new DataSource.OperationFailedCallback() {
-                        @Override
-                        public void onFailed() {
-                            mSaveResultListener.onSaveFailed();
-                        }
-                    });
-        }
-    }
 
     /**
      * SAVE RESULT LISTENER

@@ -20,12 +20,12 @@ import com.android.colorpicker.ColorPickerDialog;
 import com.android.colorpicker.ColorPickerSwatch;
 import com.f_candy_d.dashboard.R;
 import com.f_candy_d.dashboard.presentation.component.EditTextDialog;
-import com.f_candy_d.dashboard.presentation.contract.EditDashboardContract;
-import com.f_candy_d.dashboard.presentation.presenter.EditDashboardPresenter;
+import com.f_candy_d.dashboard.presentation.contract.DashboardDetailsContract;
+import com.f_candy_d.dashboard.presentation.presenter.DashboardDetailsPresenter;
 import com.f_candy_d.dashboard.presentation.utils.ColorUtils;
 
-public class DashboardEditorActivity extends AppCompatActivity
-        implements EditDashboardContract.View {
+public class DashboardDetailsActivity extends AppCompatActivity
+        implements DashboardDetailsContract.View {
 
     private static final String FRAGMENT_TAG_EDIT_TEXT_DIALOG = "edit_text_dialog";
     private static final String FRAGMENT_TAG_COLOR_PICKER_DIALOG = "color_picker_dialog";
@@ -37,7 +37,7 @@ public class DashboardEditorActivity extends AppCompatActivity
     public static final String KEY_START_WITH_EDIT_TITLE_DIALOG = "start_with_edit_title_dialog";
 
     private boolean mIsActivityOnFirstRun;
-    private EditDashboardPresenter mPresenter;
+    private DashboardDetailsPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +46,9 @@ public class DashboardEditorActivity extends AppCompatActivity
         // Initialization
         mIsActivityOnFirstRun = (savedInstanceState == null);
         if (getIntent().getExtras() != null && getIntent().hasExtra(KEY_TARGET_DASHBOARD_ID)) {
-            mPresenter = new EditDashboardPresenter(getIntent().getExtras().getLong(KEY_TARGET_DASHBOARD_ID));
+            mPresenter = new DashboardDetailsPresenter(getIntent().getExtras().getLong(KEY_TARGET_DASHBOARD_ID));
         } else {
-            mPresenter = new EditDashboardPresenter();
+            mPresenter = new DashboardDetailsPresenter();
         }
         onCreateUI(savedInstanceState);
         mIsUiAvailable = true;
@@ -93,65 +93,13 @@ public class DashboardEditorActivity extends AppCompatActivity
         }
     }
 
-    private final EditTextDialog.ButtonClickListener EDIT_TEXT_DIALOG_BUTTON_CLICK_LISTENER =
-            new EditTextDialog.ButtonClickListener() {
-                @Override
-                public void onPositiveButtonClick(int tag, String text) {
-                    mPresenter.onInputDashboardTitle(text);
-                }
-
-                @Override
-                public void onNegativeButtonClick(int tag, String text) {}
-            };
-
-    private void showEditTitleDialog(String defaultTitle, String cancelMessage) {
-        new EditTextDialog.Builder()
-                .negativeButton(cancelMessage)
-                .editText(defaultTitle)
-                .positiveButton("OK")
-                .title("What is the Dashboard's Title?")
-                .editTextHint("Title")
-                .buttonClickListener(EDIT_TEXT_DIALOG_BUTTON_CLICK_LISTENER)
-                .create()
-                .show(getSupportFragmentManager(), FRAGMENT_TAG_EDIT_TEXT_DIALOG);
-    }
-
-    private final ColorPickerSwatch.OnColorSelectedListener COLOR_SELECTED_LISTENER
-            = new ColorPickerSwatch.OnColorSelectedListener() {
-        @Override
-        public void onColorSelected(int color) {
-            mPresenter.onInputDashboardThemeColor(color);
-        }
-    };
-
-    private void showColorPickerDialog(int selectedColor) {
-        TypedArray a = getResources().obtainTypedArray(R.array.task_theme_colors);
-        int[] colors = new int[a.length()];
-        for (int i = 0; i < a.length(); ++i) {
-            colors[i] = a.getColor(i, 0);
-        }
-        a.recycle();
-
-        int paletteColumnCount = 4;
-        ColorPickerDialog dialog = new ColorPickerDialog();
-        dialog.initialize(
-                R.string.theme_color_picker_dialog_title,
-                colors,
-                selectedColor,
-                paletteColumnCount,
-                colors.length);
-
-        dialog.setOnColorSelectedListener(COLOR_SELECTED_LISTENER);
-        dialog.show(getFragmentManager(), FRAGMENT_TAG_COLOR_PICKER_DIALOG);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
 
         boolean startWithEditTitleDialog = getIntent().getBooleanExtra(KEY_START_WITH_EDIT_TITLE_DIALOG, false);
         if (mIsActivityOnFirstRun && startWithEditTitleDialog) {
-            showEditTitleDialog(mPresenter.getDashboardTitle(), "SKIP");
+            mPresenter.onEditTitle();
             mIsActivityOnFirstRun = false;
         }
     }
@@ -177,9 +125,9 @@ public class DashboardEditorActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_edit_title) {
-            showEditTitleDialog(mPresenter.getDashboardTitle(), "CANCEL");
+            mPresenter.onEditTitle();
         } else if (id == R.id.action_select_theme_color) {
-            showColorPickerDialog(mPresenter.getDashboardThemeColor());
+            mPresenter.onEditThemeColor();
         }
 
         return super.onOptionsItemSelected(item);
@@ -205,12 +153,12 @@ public class DashboardEditorActivity extends AppCompatActivity
     }
 
     @Override
-    public void showDashboardTitle(String title) {
+    public void showTitle(String title) {
         ((CollapsingToolbarLayout) findViewById(R.id.toolbar_layout)).setTitle(title);
     }
 
     @Override
-    public void showDashboardThemeColor(int themeColor) {
+    public void showThemeColor(int themeColor) {
         findViewById(R.id.root_view).setBackgroundColor(themeColor);
         findViewById(R.id.app_bar).setBackgroundColor(themeColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -239,5 +187,59 @@ public class DashboardEditorActivity extends AppCompatActivity
         }
         setResult(resultCode, intent);
         finish();
+    }
+
+    private final EditTextDialog.ButtonClickListener EDIT_TEXT_DIALOG_BUTTON_CLICK_LISTENER =
+            new EditTextDialog.ButtonClickListener() {
+                @Override
+                public void onPositiveButtonClick(int tag, String text) {
+                    mPresenter.onInputTitle(text);
+                }
+
+                @Override
+                public void onNegativeButtonClick(int tag, String text) {}
+            };
+
+    @Override
+    public void showTitleEditor(String currentTitle) {
+        new EditTextDialog.Builder()
+                .negativeButton("CLOSE")
+                .editText(currentTitle)
+                .positiveButton("OK")
+                .title("What is the Dashboard's Title?")
+                .editTextHint("Title")
+                .buttonClickListener(EDIT_TEXT_DIALOG_BUTTON_CLICK_LISTENER)
+                .create()
+                .show(getSupportFragmentManager(), FRAGMENT_TAG_EDIT_TEXT_DIALOG);
+    }
+
+    private final ColorPickerSwatch.OnColorSelectedListener COLOR_SELECTED_LISTENER
+            = new ColorPickerSwatch.OnColorSelectedListener() {
+        @Override
+        public void onColorSelected(int color) {
+            mPresenter.onInputThemeColor(color);
+        }
+    };
+
+    @Override
+    public void showThemeColorEditor(int currentThemeColor) {
+        TypedArray a = getResources().obtainTypedArray(R.array.task_theme_colors);
+        int[] colors = new int[a.length()];
+        for (int i = 0; i < a.length(); ++i) {
+            colors[i] = a.getColor(i, 0);
+        }
+        a.recycle();
+
+        int paletteColumnCount = 4;
+        ColorPickerDialog dialog = new ColorPickerDialog();
+        dialog.initialize(
+                R.string.theme_color_picker_dialog_title,
+                colors,
+                currentThemeColor,
+                paletteColumnCount,
+                colors.length);
+
+        dialog.setOnColorSelectedListener(COLOR_SELECTED_LISTENER);
+        dialog.show(getFragmentManager(), FRAGMENT_TAG_COLOR_PICKER_DIALOG);
     }
 }

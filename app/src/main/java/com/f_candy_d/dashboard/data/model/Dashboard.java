@@ -34,8 +34,7 @@ public class Dashboard extends Entity<Dashboard> {
     }
 
     public Dashboard(@NonNull Dashboard source) {
-        super(source.getId());
-        initialize(source);
+        super(source);
     }
 
     @Override

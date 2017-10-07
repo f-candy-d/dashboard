@@ -15,28 +15,12 @@ public interface DataSource {
 
     long INVALID_ID = -1;
 
-    interface LoadDataCallback<T extends Entity> {
-        void onDataLoaded(@NonNull T data);
+    interface ResultCallback<T extends Entity<T>> {
+        void onResult(@NonNull T data);
     }
 
-    interface LoadALotOfDataCallback<T extends Entity> {
-        void onDataLoaded(@NonNull List<T> data);
-    }
-
-    interface SaveDataCallback<T extends Entity> {
-        void onDataSaved(@NonNull T data);
-    }
-
-    interface SaveALotOfDataCallback<T extends Entity> {
-        void onDataSaved(@NonNull List<T> data);
-    }
-
-    interface DeleteDataCallback<T extends Entity> {
-        void onDataDeleted(@NonNull T data);
-    }
-    
-    interface DeleteALotOfDataCallback<T extends Entity> {
-        void onDataDelete(@NonNull List<T> data);
+    interface ManyResultsCallback<T extends Entity<T>> {
+        void onManyResults(@NonNull List<T> data);
     }
 
     interface OperationFailedCallback {
@@ -48,20 +32,20 @@ public interface DataSource {
      * ----------------------------------------------------------------------------- */
 
     // General methods
-    void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
-    void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
-    void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
-    void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
-    void deleteDashboard(@NonNull Dashboard dashboard, DeleteDataCallback<Dashboard> deleteDataCallback, OperationFailedCallback failedCallback);
-    void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, DeleteALotOfDataCallback<Dashboard> deleteCallback, OperationFailedCallback failedCallback);
+    void loadDashboard(long id, ResultCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
+    void loadAllDashboards(ManyResultsCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback);
+    void saveDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
+    void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback);
+    void deleteDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> deleteDataCallback, OperationFailedCallback failedCallback);
+    void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> deleteCallback, OperationFailedCallback failedCallback);
 
     // Convenience methods
-    void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback);
-    void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback);
-    void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback);
-    void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback);
+    void loadDashboard(long id, ResultCallback<Dashboard> loadCallback);
+    void loadAllDashboards(ManyResultsCallback<Dashboard> loadCallback);
+    void saveDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> saveCallback);
+    void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> saveCallback);
     // revertIfError == true
-    void saveDashboards(@NonNull List<Dashboard> dashboards, SaveALotOfDataCallback<Dashboard> saveCallback);
+    void saveDashboards(@NonNull List<Dashboard> dashboards, ManyResultsCallback<Dashboard> saveCallback);
     void deleteDashboard(@NonNull Dashboard dashboard, OperationFailedCallback failedCallback);
     void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, OperationFailedCallback failedCallback);
     // revertIfError == true

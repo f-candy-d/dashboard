@@ -28,9 +28,9 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public void onRefresh() {
         Repository.getInstance().loadAllDashboards(
-                new DataSource.LoadALotOfDataCallback<Dashboard>() {
+                new DataSource.ManyResultsCallback<Dashboard>() {
                     @Override
-                    public void onDataLoaded(@NonNull List<Dashboard> data) {
+                    public void onManyResults(@NonNull List<Dashboard> data) {
                         if (mView.isAvailable()) {
                             mView.replaceDashboards(data);
                         }
@@ -68,9 +68,9 @@ public class HomePresenter implements HomeContract.Presenter {
                 .releaseTarget();
 
         Repository.getInstance().saveDashboard(dashboard,
-                new DataSource.SaveDataCallback<Dashboard>() {
+                new DataSource.ResultCallback<Dashboard>() {
                     @Override
-                    public void onDataSaved(@NonNull Dashboard data) {
+                    public void onResult(@NonNull Dashboard data) {
                         if (mView.isAvailable()) {
                             mView.onDashboardArchived(data);
                         }

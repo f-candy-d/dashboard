@@ -2,7 +2,6 @@ package com.f_candy_d.dashboard.presentation.view;
 
 import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,15 +15,11 @@ import android.widget.Toast;
 
 import com.f_candy_d.dashboard.R;
 import com.f_candy_d.dashboard.data.model.Dashboard;
-import com.f_candy_d.dashboard.data.source.DataSource;
-import com.f_candy_d.dashboard.data.source.Repository;
 import com.f_candy_d.dashboard.presentation.contract.HomeContract;
-import com.f_candy_d.dashboard.presentation.presenter.EditDashboardPresenter;
 import com.f_candy_d.dashboard.presentation.presenter.HomePresenter;
 import com.f_candy_d.dashboard.presentation.utils.ItemClickHelper;
 import com.f_candy_d.dashboard.presentation.component.DashboardAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements HomeContract.View {
@@ -149,16 +144,16 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
 
     @Override
     public void showDashboardDetailsUi(long targetDashboardId) {
-        Intent intent = new Intent(this, DashboardEditorActivity.class);
-        intent.putExtra(DashboardEditorActivity.KEY_TARGET_DASHBOARD_ID, targetDashboardId);
-        intent.putExtra(DashboardEditorActivity.KEY_START_WITH_EDIT_TITLE_DIALOG, false);
+        Intent intent = new Intent(this, DashboardDetailsActivity.class);
+        intent.putExtra(DashboardDetailsActivity.KEY_TARGET_DASHBOARD_ID, targetDashboardId);
+        intent.putExtra(DashboardDetailsActivity.KEY_START_WITH_EDIT_TITLE_DIALOG, false);
         startActivity(intent);
     }
 
     @Override
     public void showCreateNewDashboardUi() {
-        Intent intent = new Intent(this, DashboardEditorActivity.class);
-        intent.putExtra(DashboardEditorActivity.KEY_START_WITH_EDIT_TITLE_DIALOG, true);
+        Intent intent = new Intent(this, DashboardDetailsActivity.class);
+        intent.putExtra(DashboardDetailsActivity.KEY_START_WITH_EDIT_TITLE_DIALOG, true);
         startActivity(intent);
     }
 }

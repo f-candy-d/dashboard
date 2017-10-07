@@ -26,7 +26,7 @@ public class SqliteDataSource implements DataSource {
     }
 
     @Override
-    public void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback) {
+    public void loadDashboard(long id, ResultCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback) {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         QueryBuilder queryBuilder = new QueryBuilder()
                 .table(DashboardTable.TABLE_NAME)
@@ -36,7 +36,7 @@ public class SqliteDataSource implements DataSource {
         db.close();
         
         if (results.size() == 1 && loadCallback != null) {
-            loadCallback.onDataLoaded(results.get(0));
+            loadCallback.onResult(results.get(0));
         }
         if (results.size() != 1 && failedCallback != null) {
             failedCallback.onFailed();
@@ -44,12 +44,12 @@ public class SqliteDataSource implements DataSource {
     }
 
     @Override
-    public void loadDashboard(long id, LoadDataCallback<Dashboard> loadCallback) {
+    public void loadDashboard(long id, ResultCallback<Dashboard> loadCallback) {
         loadDashboard(id, loadCallback, null);
     }
 
     @Override
-    public void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback) {
+    public void loadAllDashboards(ManyResultsCallback<Dashboard> loadCallback, OperationFailedCallback failedCallback) {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         QueryBuilder queryBuilder = new QueryBuilder()
                 .table(DashboardTable.TABLE_NAME);
@@ -58,7 +58,7 @@ public class SqliteDataSource implements DataSource {
         db.close();
 
         if (results.size() != 0 && loadCallback != null) {
-            loadCallback.onDataLoaded(results);
+            loadCallback.onManyResults(results);
         }
         if (results.size() == 0 && failedCallback != null) {
             failedCallback.onFailed();
@@ -66,19 +66,19 @@ public class SqliteDataSource implements DataSource {
     }
 
     @Override
-    public void loadAllDashboards(LoadALotOfDataCallback<Dashboard> loadCallback) {
+    public void loadAllDashboards(ManyResultsCallback<Dashboard> loadCallback) {
         loadAllDashboards(loadCallback, null);
     }
 
     @Override
-    public void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback) {
+    public void saveDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         // Update
         boolean result = DashboardCrud.update(db, dashboard, true);
         if (result) {
             db.close();
             if (saveCallback != null) {
-                saveCallback.onDataSaved(dashboard);
+                saveCallback.onResult(dashboard);
             }
             
         } else {
@@ -86,7 +86,7 @@ public class SqliteDataSource implements DataSource {
             long id = DashboardCrud.create(db, dashboard);
             db.close();
             if (id != INVALID_ID && saveCallback != null) {
-                saveCallback.onDataSaved(new Dashboard.Modifier(dashboard).id(id).releaseTarget());
+                saveCallback.onResult(new Dashboard.Modifier(dashboard).id(id).releaseTarget());
             }
             if (id == INVALID_ID && failedCallback != null) {
                 failedCallback.onFailed();
@@ -95,12 +95,12 @@ public class SqliteDataSource implements DataSource {
     }
 
     @Override
-    public void saveDashboard(@NonNull Dashboard dashboard, SaveDataCallback<Dashboard> saveCallback) {
+    public void saveDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> saveCallback) {
         saveDashboard(dashboard, saveCallback, null);
     }
 
     @Override
-    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback) {
+    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> saveCallback, OperationFailedCallback failedCallback) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         ArrayList<Dashboard> saved = new ArrayList<>(dashboards.size());
         boolean isError = false;
@@ -137,27 +137,27 @@ public class SqliteDataSource implements DataSource {
             failedCallback.onFailed();
         }
         if (!isError && saveCallback != null) {
-            saveCallback.onDataSaved(saved);
+            saveCallback.onManyResults(saved);
         }
     }
 
     @Override
-    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, SaveALotOfDataCallback<Dashboard> saveCallback) {
+    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> saveCallback) {
         saveDashboards(dashboards, revertIfError, saveCallback, null);
     }
 
     @Override
-    public void saveDashboards(@NonNull List<Dashboard> dashboards, SaveALotOfDataCallback<Dashboard> saveCallback) {
+    public void saveDashboards(@NonNull List<Dashboard> dashboards, ManyResultsCallback<Dashboard> saveCallback) {
         saveDashboards(dashboards, true, saveCallback, null);
     }
 
     @Override
-    public void deleteDashboard(@NonNull Dashboard dashboard, DeleteDataCallback<Dashboard> deleteDataCallback, OperationFailedCallback failedCallback) {
+    public void deleteDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> deleteDataCallback, OperationFailedCallback failedCallback) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         if (DashboardCrud.delete(db, dashboard, true)) {
             db.close();
             if (deleteDataCallback != null) {
-                deleteDataCallback.onDataDeleted(dashboard);
+                deleteDataCallback.onResult(dashboard);
             }
         } else {
             if (failedCallback != null) {
@@ -172,7 +172,7 @@ public class SqliteDataSource implements DataSource {
     }
 
     @Override
-    public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, DeleteALotOfDataCallback<Dashboard> deleteCallback, OperationFailedCallback failedCallback) {
+    public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> deleteCallback, OperationFailedCallback failedCallback) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         boolean isError = false;
 
@@ -198,7 +198,7 @@ public class SqliteDataSource implements DataSource {
             failedCallback.onFailed();
         }
         if (!isError && deleteCallback != null) {
-            deleteCallback.onDataDelete(dashboards);
+            deleteCallback.onManyResults(dashboards);
         }
     }
 

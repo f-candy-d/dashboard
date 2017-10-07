@@ -1,32 +1,31 @@
 package com.f_candy_d.dashboard.presentation.presenter;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.f_candy_d.dashboard.data.model.Dashboard;
 import com.f_candy_d.dashboard.data.source.DataSource;
 import com.f_candy_d.dashboard.data.source.Repository;
-import com.f_candy_d.dashboard.presentation.contract.EditDashboardContract;
+import com.f_candy_d.dashboard.presentation.contract.DashboardDetailsContract;
 
 /**
  * Created by daichi on 10/5/17.
  */
 
-public class EditDashboardPresenter implements EditDashboardContract.Presenter {
+public class DashboardDetailsPresenter implements DashboardDetailsContract.Presenter {
 
-    private EditDashboardContract.View mView;
+    private DashboardDetailsContract.View mView;
     private Dashboard mDashboard;
     private Dashboard.Modifier mDashboardModifier;
 
-    public EditDashboardPresenter() {
+    public DashboardDetailsPresenter() {
         initializeAsBlank();
     }
 
-    public EditDashboardPresenter(long targetDashboardId) {
+    public DashboardDetailsPresenter(long targetDashboardId) {
         Repository.getInstance().loadDashboard(targetDashboardId,
-                new DataSource.LoadDataCallback<Dashboard>() {
+                new DataSource.ResultCallback<Dashboard>() {
                     @Override
-                    public void onDataLoaded(@NonNull Dashboard data) {
+                    public void onResult(@NonNull Dashboard data) {
                         mDashboard = data;
                         mDashboardModifier = new Dashboard.Modifier(mDashboard);
                     }
@@ -45,16 +44,16 @@ public class EditDashboardPresenter implements EditDashboardContract.Presenter {
     }
 
     @Override
-    public void onStart(EditDashboardContract.View view) {
+    public void onStart(DashboardDetailsContract.View view) {
         mView = view;
         if (mView.isAvailable()) {
-            mView.showDashboardTitle(mDashboard.getTitle());
-            mView.showDashboardThemeColor(mDashboard.getThemeColor());
+            mView.showTitle(mDashboard.getTitle());
+            mView.showThemeColor(mDashboard.getThemeColor());
         }
     }
 
     @Override
-    public void onInputDashboardTitle(String title) {
+    public void onInputTitle(String title) {
         if (title == null || title.length() == 0) {
             mDashboardModifier.title(null);
         } else {
@@ -62,16 +61,16 @@ public class EditDashboardPresenter implements EditDashboardContract.Presenter {
         }
 
         if (mView.isAvailable()) {
-            mView.showDashboardTitle(title);
+            mView.showTitle(title);
         }
     }
 
     @Override
-    public void onInputDashboardThemeColor(int themeColor) {
+    public void onInputThemeColor(int themeColor) {
         mDashboardModifier.themeColor(themeColor);
 
         if (mView.isAvailable()) {
-            mView.showDashboardThemeColor(themeColor);
+            mView.showThemeColor(themeColor);
         }
     }
 
@@ -79,9 +78,9 @@ public class EditDashboardPresenter implements EditDashboardContract.Presenter {
     public void onSave() {
         if (isDashboardModified()) {
             Repository.getInstance().saveDashboard(mDashboard,
-                    new DataSource.SaveDataCallback<Dashboard>() {
+                    new DataSource.ResultCallback<Dashboard>() {
                         @Override
-                        public void onDataSaved(@NonNull Dashboard data) {
+                        public void onResult(@NonNull Dashboard data) {
                             if (mView.isAvailable()) {
                                 mView.showSaveSuccessfullyMessage();
                                 mView.onCloseUi(null, true);
@@ -106,13 +105,17 @@ public class EditDashboardPresenter implements EditDashboardContract.Presenter {
     }
 
     @Override
-    public String getDashboardTitle() {
-        return mDashboard.getTitle();
+    public void onEditTitle() {
+        if (mView.isAvailable()) {
+            mView.showTitleEditor(mDashboard.getTitle());
+        }
     }
 
     @Override
-    public int getDashboardThemeColor() {
-        return mDashboard.getThemeColor();
+    public void onEditThemeColor() {
+        if (mView.isAvailable()) {
+            mView.showThemeColorEditor(mDashboard.getThemeColor());
+        }
     }
 
     private boolean isDashboardModified() {

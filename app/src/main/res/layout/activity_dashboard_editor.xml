@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.f_candy_d.dashboard.presentation.view.DashboardEditorActivity">
+    tools:context="com.f_candy_d.dashboard.presentation.view.DashboardDetailsActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"

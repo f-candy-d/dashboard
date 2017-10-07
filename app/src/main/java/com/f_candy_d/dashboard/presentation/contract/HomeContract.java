@@ -1,7 +1,5 @@
 package com.f_candy_d.dashboard.presentation.contract;
 
-import android.os.Bundle;
-
 import com.f_candy_d.dashboard.data.model.Dashboard;
 
 import java.util.List;

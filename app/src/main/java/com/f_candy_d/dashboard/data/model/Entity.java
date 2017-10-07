@@ -22,6 +22,10 @@ abstract public class Entity<T extends Entity<T>> {
         this(DataSource.INVALID_ID);
     }
 
+    public Entity(@NonNull T source) {
+        initialize(source);
+    }
+
     public long getId() {
         return mId;
     }
