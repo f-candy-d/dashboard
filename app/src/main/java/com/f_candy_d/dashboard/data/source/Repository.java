@@ -2,20 +2,27 @@ package com.f_candy_d.dashboard.data.source;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 
 import com.f_candy_d.dashboard.data.model.Dashboard;
+import com.f_candy_d.dashboard.data.model.Entity;
+import com.f_candy_d.dashboard.data.model.TextNote;
 import com.f_candy_d.dashboard.data.source.local.SqliteDataSource;
+import com.f_candy_d.dashboard.data.source.local.table.DashboardTable;
+import com.f_candy_d.dashboard.data.source.local.table.TextNoteTable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by daichi on 10/1/17.
  */
 
-public class Repository extends DataSource {
+public class Repository implements DataSource {
 
     private static Repository INSTANCE = null;
 
@@ -35,28 +42,89 @@ public class Repository extends DataSource {
     }
 
     public void refresh() {
-        clearDashboardCache();
+        clearAllCache();
+    }
+
+    /**
+     * CACHE
+     * ----------------------------------------------------------------------------- */
+
+    @NonNull private Map<String, LongSparseArray<Entity<?>>> mCaches = new HashMap<>();
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    private <T extends Entity<T>> T findInCache(@NonNull String table, long id) {
+        if (!mCaches.containsKey(table)) {
+            return null;
+        }
+
+        return (T) mCaches.get(table).get(id, null);
+    }
+
+    private <T extends Entity<T>> void cache(@NonNull String table, @NonNull T entity) {
+        if (!mCaches.containsKey(table)) {
+            mCaches.put(table, new LongSparseArray<>());
+        }
+        mCaches.get(table).put(entity.getId(), entity);
+    }
+
+    private <T extends Entity<T>> void cacheAll(@NonNull String table, @NonNull List<T> entities) {
+        if (!mCaches.containsKey(table)) {
+            mCaches.put(table, new LongSparseArray<>());
+        }
+        for (T entity : entities) {
+            mCaches.get(table).put(entity.getId(), entity);
+        }
+    }
+
+    private <T extends Entity<T>> void releaseCached(@NonNull String table, @NonNull T entity) {
+        if (mCaches.containsKey(table)) {
+            mCaches.get(table).remove(entity.getId());
+            if (mCaches.get(table).size() == 0) {
+                mCaches.remove(table);
+            }
+        }
+    }
+
+    private <T extends Entity<T>> void releaseCachedAll(@NonNull String table, @NonNull List<T> entities) {
+        if (mCaches.containsKey(table)) {
+            for (T entity : entities) {
+                mCaches.get(table).remove(entity.getId());
+            }
+            if (mCaches.get(table).size() == 0) {
+                mCaches.remove(table);
+            }
+        }
+    }
+
+    private void clearCacheOf(@NonNull String table) {
+        if (!mCaches.containsKey(table)) {
+            mCaches.get(table).clear();
+            mCaches.remove(table);
+        }
+    }
+
+    private void clearAllCache() {
+        mCaches.clear();
     }
 
     /**
      * CRUD FOR DASHBOARD
      * ----------------------------------------------------------------------------- */
 
-    private LongSparseArray<Dashboard> mDashboardCache;
-
     @Override
     public void loadDashboard(long id, final ResultCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
-        Dashboard cached = mDashboardCache.get(id);
-        if (mDashboardCache != null && cached != null) {
+        Dashboard cached = findInCache(DashboardTable.TABLE_NAME, id);
+        if (cached != null) {
             if (loadCallback != null) {
                 loadCallback.onResult(cached);
             }
             return;
         }
 
-        mLocalDataSource.loadDashboard(id, 
+        mLocalDataSource.loadDashboard(id,
                 (data) -> {
-                    cacheDashboard(data);
+                    cache(DashboardTable.TABLE_NAME, data);
                     if (loadCallback != null) {
                         loadCallback.onResult(data);
                     }
@@ -72,7 +140,7 @@ public class Repository extends DataSource {
     public void loadAllDashboards(final ManyResultsCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.loadAllDashboards(
                 (data) -> {
-                    cacheDashboards(data);
+                    cacheAll(DashboardTable.TABLE_NAME, data);
                     if (loadCallback != null) {
                         loadCallback.onManyResults(data);
                     }
@@ -87,21 +155,15 @@ public class Repository extends DataSource {
     @Override
     public void saveDashboard(@NonNull final Dashboard dashboard, final ResultCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.saveDashboard(checkNotNull(dashboard),
-                new ResultCallback<Dashboard>() {
-                    @Override
-                    public void onResult(@NonNull Dashboard data) {
-                        cacheDashboard(data);
-                        if (saveCallback != null) {
-                            saveCallback.onResult(data);
-                        }
+                (data) -> {
+                    cache(DashboardTable.TABLE_NAME, data);
+                    if (saveCallback != null) {
+                        saveCallback.onResult(data);
                     }
                 },
-                new OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        if (failedCallback != null) {
-                            failedCallback.onFailed();
-                        }
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
                     }
                 });
     }
@@ -109,21 +171,15 @@ public class Repository extends DataSource {
     @Override
     public void saveDashboards(@NonNull final List<Dashboard> dashboards, boolean revertIfError, final ManyResultsCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.saveDashboards(checkNotNull(dashboards), revertIfError,
-                new ManyResultsCallback<Dashboard>() {
-                    @Override
-                    public void onManyResults(@NonNull List<Dashboard> data) {
-                        releaseCachedDashboards(data);
-                        if (saveCallback != null) {
-                            saveCallback.onManyResults(data);
-                        }
+                (data) -> {
+                    releaseCachedAll(DashboardTable.TABLE_NAME, data);
+                    if (saveCallback != null) {
+                        saveCallback.onManyResults(data);
                     }
                 },
-                new OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        if (failedCallback != null) {
-                            failedCallback.onFailed();
-                        }
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
                     }
                 });
     }
@@ -131,21 +187,15 @@ public class Repository extends DataSource {
     @Override
     public void deleteDashboard(@NonNull final Dashboard dashboard, final ResultCallback<Dashboard> deleteDataCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.deleteDashboard(checkNotNull(dashboard),
-                new ResultCallback<Dashboard>() {
-                    @Override
-                    public void onResult(@NonNull Dashboard data) {
-                        releaseCachedDashboard(dashboard);
-                        if (deleteDataCallback != null) {
-                            deleteDataCallback.onResult(data);
-                        }
+                (data) -> {
+                    releaseCached(DashboardTable.TABLE_NAME, dashboard);
+                    if (deleteDataCallback != null) {
+                        deleteDataCallback.onResult(data);
                     }
                 },
-                new OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        if (failedCallback != null) {
-                            failedCallback.onFailed();
-                        }
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
                     }
                 });
     }
@@ -153,66 +203,124 @@ public class Repository extends DataSource {
     @Override
     public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, final ManyResultsCallback<Dashboard> deleteCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.deleteDashboards(checkNotNull(dashboards), revertIfError,
-                new ManyResultsCallback<Dashboard>() {
-                    @Override
-                    public void onManyResults(@NonNull List<Dashboard> data) {
-                        releaseCachedDashboards(data);
-                        if (deleteCallback != null) {
-                            deleteCallback.onManyResults(data);
-                        }
+                (data) -> {
+                    releaseCachedAll(DashboardTable.TABLE_NAME, data);
+                    if (deleteCallback != null) {
+                        deleteCallback.onManyResults(data);
                     }
                 },
-                new OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        if (failedCallback != null) {
-                            failedCallback.onFailed();
-                        }
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
                     }
                 });
     }
 
-    private void cacheDashboard(@NonNull Dashboard dashboard) {
-        if (mDashboardCache == null) {
-            mDashboardCache = new LongSparseArray<>();
-        }
-        mDashboardCache.put(dashboard.getId(), dashboard);
-    }
+    /**
+     * CRUD FOR TEXT_NOTE
+     * ----------------------------------------------------------------------------- */
 
-    private void cacheDashboards(@NonNull List<Dashboard> dashboards) {
-        if (mDashboardCache == null) {
-            mDashboardCache = new LongSparseArray<>();
-        }
-
-        for (Dashboard dashboard : dashboards) {
-            mDashboardCache.put(dashboard.getId(), dashboard);
-        }
-    }
-
-    private void releaseCachedDashboard(@NonNull Dashboard dashboard) {
-        if (mDashboardCache != null) {
-            mDashboardCache.remove(dashboard.getId());
-            if (mDashboardCache.size() == 0) {
-                mDashboardCache = null;
+    @Override
+    public void loadTextNote(long id, final ResultCallback<TextNote> loadCallback, final OperationFailedCallback failedCallback) {
+        TextNote cached = findInCache(TextNoteTable.TABLE_NAME, id);
+        if (cached != null) {
+            if (loadCallback != null) {
+                loadCallback.onResult(cached);
             }
+            return;
         }
+
+        mLocalDataSource.loadTextNote(id,
+                (data) -> {
+                    cache(TextNoteTable.TABLE_NAME, data);
+                    if (loadCallback != null) {
+                        loadCallback.onResult(data);
+                    }
+                },
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
+                    }
+                });
     }
 
-    private void releaseCachedDashboards(@NonNull List<Dashboard> dashboards) {
-        if (mDashboardCache != null) {
-            for (Dashboard dashboard : dashboards) {
-                mDashboardCache.remove(dashboard.getId());
-            }
-            if (mDashboardCache.size() == 0) {
-                mDashboardCache = null;
-            }
-        }
+    @Override
+    public void loadAllTextNotes(final ManyResultsCallback<TextNote> loadCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.loadAllTextNotes(
+                (data) -> {
+                    cacheAll(TextNoteTable.TABLE_NAME, data);
+                    if (loadCallback != null) {
+                        loadCallback.onManyResults(data);
+                    }
+                },
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
+                    }
+                });
     }
 
-    private void clearDashboardCache() {
-        if (mDashboardCache != null) {
-            mDashboardCache.clear();
-            mDashboardCache = null;
-        }
+    @Override
+    public void saveTextNote(@NonNull final TextNote textNote, final ResultCallback<TextNote> saveCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.saveTextNote(checkNotNull(textNote),
+                (data) -> {
+                    cache(TextNoteTable.TABLE_NAME, data);
+                    if (saveCallback != null) {
+                        saveCallback.onResult(data);
+                    }
+                },
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
+                    }
+                });
+    }
+
+    @Override
+    public void saveTextNotes(@NonNull final List<TextNote> textNotes, boolean revertIfError, final ManyResultsCallback<TextNote> saveCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.saveTextNotes(checkNotNull(textNotes), revertIfError,
+                (data) -> {
+                    releaseCachedAll(TextNoteTable.TABLE_NAME, data);
+                    if (saveCallback != null) {
+                        saveCallback.onManyResults(data);
+                    }
+                },
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
+                    }
+                });
+    }
+
+    @Override
+    public void deleteTextNote(@NonNull final TextNote textNote, final ResultCallback<TextNote> deleteDataCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.deleteTextNote(checkNotNull(textNote),
+                (data) -> {
+                    releaseCached(TextNoteTable.TABLE_NAME, textNote);
+                    if (deleteDataCallback != null) {
+                        deleteDataCallback.onResult(data);
+                    }
+                },
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
+                    }
+                });
+    }
+
+    @Override
+    public void deleteTextNotes(@NonNull List<TextNote> textNotes, boolean revertIfError, final ManyResultsCallback<TextNote> deleteCallback, final OperationFailedCallback failedCallback) {
+        mLocalDataSource.deleteTextNotes(checkNotNull(textNotes), revertIfError,
+                (data) -> {
+                    releaseCachedAll(TextNoteTable.TABLE_NAME, data);
+                    if (deleteCallback != null) {
+                        deleteCallback.onManyResults(data);
+                    }
+                },
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
+                    }
+                });
     }
 }
