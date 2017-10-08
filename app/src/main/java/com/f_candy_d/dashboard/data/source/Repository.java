@@ -15,7 +15,7 @@ import java.util.List;
  * Created by daichi on 10/1/17.
  */
 
-public class Repository implements DataSource {
+public class Repository extends DataSource {
 
     private static Repository INSTANCE = null;
 
@@ -55,55 +55,33 @@ public class Repository implements DataSource {
         }
 
         mLocalDataSource.loadDashboard(id, 
-                new ResultCallback<Dashboard>() {
-                    @Override
-                    public void onResult(@NonNull Dashboard data) {
-                        cacheDashboard(data);
-                        if (loadCallback != null) {
-                            loadCallback.onResult(data);
-                        }
+                (data) -> {
+                    cacheDashboard(data);
+                    if (loadCallback != null) {
+                        loadCallback.onResult(data);
                     }
                 },
-                new OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        if (failedCallback != null) {
-                            failedCallback.onFailed();
-                        }
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
                     }
                 });
     }
 
-    @Override
-    public void loadDashboard(long id, ResultCallback<Dashboard> loadCallback) {
-        loadDashboard(id, loadCallback, null);
-    }
-    
     @Override
     public void loadAllDashboards(final ManyResultsCallback<Dashboard> loadCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.loadAllDashboards(
-                new ManyResultsCallback<Dashboard>() {
-                    @Override
-                    public void onManyResults(@NonNull List<Dashboard> data) {
-                        cacheDashboards(data);
-                        if (loadCallback != null) {
-                            loadCallback.onManyResults(data);
-                        }
+                (data) -> {
+                    cacheDashboards(data);
+                    if (loadCallback != null) {
+                        loadCallback.onManyResults(data);
                     }
                 },
-                new OperationFailedCallback() {
-                    @Override
-                    public void onFailed() {
-                        if (failedCallback != null) {
-                            failedCallback.onFailed();
-                        }
+                () -> {
+                    if (failedCallback != null) {
+                        failedCallback.onFailed();
                     }
                 });
-    }
-
-    @Override
-    public void loadAllDashboards(ManyResultsCallback<Dashboard> loadCallback) {
-        loadAllDashboards(loadCallback, null);
     }
 
     @Override
@@ -129,11 +107,6 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void saveDashboard(@NonNull Dashboard dashboard, ResultCallback<Dashboard> saveCallback) {
-        saveDashboard(dashboard, saveCallback, null);
-    }
-
-    @Override
     public void saveDashboards(@NonNull final List<Dashboard> dashboards, boolean revertIfError, final ManyResultsCallback<Dashboard> saveCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.saveDashboards(checkNotNull(dashboards), revertIfError,
                 new ManyResultsCallback<Dashboard>() {
@@ -155,16 +128,6 @@ public class Repository implements DataSource {
                 });
     }
 
-    @Override
-    public void saveDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, ManyResultsCallback<Dashboard> saveCallback) {
-        saveDashboards(dashboards, revertIfError, saveCallback, null);
-    }
-
-    @Override
-    public void saveDashboards(@NonNull List<Dashboard> dashboards, ManyResultsCallback<Dashboard> saveCallback) {
-        saveDashboards(dashboards, true, saveCallback, null);
-    }
-    
     @Override
     public void deleteDashboard(@NonNull final Dashboard dashboard, final ResultCallback<Dashboard> deleteDataCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.deleteDashboard(checkNotNull(dashboard),
@@ -188,11 +151,6 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void deleteDashboard(@NonNull Dashboard dashboard, OperationFailedCallback failedCallback) {
-        deleteDashboard(dashboard, null, failedCallback);
-    }
-
-    @Override
     public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, final ManyResultsCallback<Dashboard> deleteCallback, final OperationFailedCallback failedCallback) {
         mLocalDataSource.deleteDashboards(checkNotNull(dashboards), revertIfError,
                 new ManyResultsCallback<Dashboard>() {
@@ -212,16 +170,6 @@ public class Repository implements DataSource {
                         }
                     }
                 });
-    }
-
-    @Override
-    public void deleteDashboards(@NonNull List<Dashboard> dashboards, boolean revertIfError, OperationFailedCallback failedCallback) {
-        deleteDashboards(dashboards, revertIfError, null, failedCallback);
-    }
-
-    @Override
-    public void deleteDashboards(@NonNull List<Dashboard> dashboards, OperationFailedCallback failedCallback) {
-        deleteDashboards(dashboards, true, null, failedCallback);
     }
 
     private void cacheDashboard(@NonNull Dashboard dashboard) {

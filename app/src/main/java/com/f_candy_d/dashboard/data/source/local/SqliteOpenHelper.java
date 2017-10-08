@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.f_candy_d.dashboard.data.source.local.table.DashboardTable;
+import com.f_candy_d.dashboard.data.source.local.table.TextNoteTable;
 import com.f_candy_d.sqliteutils.TableUtils;
 
 /**
@@ -22,10 +24,13 @@ class SqliteOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         TableUtils.createTable(sqLiteDatabase, DashboardTable.getTableSource());
+        TableUtils.createTable(sqLiteDatabase, TextNoteTable.getTableSource());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        TableUtils.resetTable(sqLiteDatabase, DashboardTable.getTableSource());
+        TableUtils.resetTable(sqLiteDatabase,
+                DashboardTable.getTableSource(),
+                TextNoteTable.getTableSource());
     }
 }

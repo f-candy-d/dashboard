@@ -8,6 +8,8 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by daichi on 10/2/17.
@@ -16,13 +18,13 @@ import java.util.Arrays;
 public class QueryBuilder {
 
     private boolean mDistinct;
-    @NonNull private final ArrayList<String> mTables;
-    @NonNull private final ArrayList<String> mProjections;
+    @NonNull private final HashSet<String> mTables;
+    @NonNull private final List<String> mProjections;
     private String mSelection;
 
     public QueryBuilder() {
         mDistinct = false;
-        mTables = new ArrayList<>();
+        mTables = new HashSet<>();
         mProjections = new ArrayList<>();
         mSelection = null;
     }

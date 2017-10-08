@@ -1,4 +1,4 @@
-package com.f_candy_d.dashboard.data.source.local;
+package com.f_candy_d.dashboard.data.source.local.table;
 
 import com.f_candy_d.sqliteutils.BaseTable;
 import com.f_candy_d.sqliteutils.ColumnDataType;
@@ -26,7 +26,7 @@ public final class DashboardTable extends BaseTable {
      * TABLE DEFINITION
      * ----------------------------------------------------------------------------- */
 
-    static TableUtils.TableSource getTableSource() {
+    public static TableUtils.TableSource getTableSource() {
         return getBaseTableSource(TABLE_NAME)
                 .put(_TITLE, ColumnDataType.TEXT)
                 .put(_IS_ARCHIVED, ColumnDataType.INTEGER)

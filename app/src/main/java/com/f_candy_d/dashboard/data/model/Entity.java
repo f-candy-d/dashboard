@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.f_candy_d.dashboard.data.source.DataSource;
 
+import javax.annotation.Nonnegative;
+
 /**
  * Created by daichi on 10/1/17.
  */
@@ -52,10 +54,10 @@ abstract public class Entity<T extends Entity<T>> {
     }
 
     /**
-     * EDITOR
+     * MODIFIER
      * ----------------------------------------------------------------------------- */
 
-    abstract static class BaseModifier<T extends Entity<T>, T2 extends BaseModifier<T, T2>> {
+    static class BaseModifier<T extends Entity<T>, T2 extends BaseModifier<T, T2>> {
 
         private T mTarget = null;
 
@@ -85,6 +87,19 @@ abstract public class Entity<T extends Entity<T>> {
         public T2 id(long id) {
             mTarget.setId(id);
             return (T2) this;
+        }
+    }
+
+    /**
+     * MODIFIER FOR ENTITY
+     * ----------------------------------------------------------------------------- */
+
+    public final static class Modifier<T extends Entity<T>> extends BaseModifier<T, Entity.Modifier<T>> {
+
+        public Modifier() {}
+
+        public Modifier(@NonNull T target) {
+            super(target);
         }
     }
 }
